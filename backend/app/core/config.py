@@ -1,5 +1,8 @@
 import os
 from pydantic import BaseModel
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path="backend/.env")
 
 class Settings(BaseModel):
     PROJECT_NAME: str = "JanMitra AI Backend"
