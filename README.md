@@ -1,16 +1,173 @@
-# React + Vite
+# JanMitra AI 🇮🇳
+> **AI-Powered Multi-Agent Citizen Assistance Platform**  
+> *AI First Hackathon 2026 — IIT Jammu & Techible*
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+JanMitra AI is an intelligent multi-agent platform designed to help Indian citizens seamlessly discover, understand, and access government schemes, healthcare advice, educational scholarships, agricultural support, and legal guidance through a single conversational interface.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## 🌟 Key Features
+- 🤖 **Multi-Agent Orchestration**: Specialized AI agents work in parallel (Gov Schemes, Healthcare, Education, Agriculture).
+- 🔀 **Intent Router**: Automatically classifies citizen prompts and routes queries to relevant domain experts.
+- 🤝 **Response Aggregator**: Combines agent insights into a single cohesive response with actionable checklists and official sources.
+- 📋 **Personalized Action Plans**: Clear, step-by-step guidance on document requirements and next steps.
+- ⚡ **FastAPI & Gemini Integration**: High-performance backend ready for RAG document retrieval.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## 🏗️ Architecture
 
-## Expanding the Oxlint configuration
+```
+User Query
+   │
+   ▼
+React Frontend
+   │
+   ▼ POST /api/chat
+FastAPI Backend
+   │
+   ▼
+Intent Router Agent
+   │
+   ├───────────────┼───────────────┼───────────────┐
+   ▼               ▼               ▼               ▼
+[Gov Schemes] [Education] [Agriculture] [Healthcare]
+   │               │               │               │
+   └───────────────┴───────┬───────┴───────────────┘
+                           ▼
+                 Response Aggregator
+                           │
+                           ▼
+                  Personalized Response
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+---
+
+## 🛠️ Technology Stack
+- **Frontend**: React (Vite), React Router DOM, Framer Motion, React Markdown
+- **Backend**: FastAPI, Python 3.10+, Uvicorn, Pydantic
+- **AI Models & Frameworks**: Google Gemini API, LangChain / LangGraph
+- **Database & RAG**: Supabase (PostgreSQL), FAISS vector search
+
+---
+
+## 📁 Repository Folder Structure
+
+```
+janmitra-ai/
+├── backend/                  # FastAPI Backend & AI Pipeline
+│   ├── main.py               # FastAPI entry point
+│   ├── requirements.txt      # Python dependencies
+│   └── app/
+│       ├── api/              # API endpoints (chat.py)
+│       ├── agents/           # AI Agents (router, expert agents, aggregator)
+│       ├── core/             # Configuration, LLM & logging
+│       ├── prompts/          # System prompts for agents
+│       ├── rag/              # Vector retriever & embeddings
+│       ├── models/           # Pydantic request/response schemas
+│       └── clients/          # External API clients (Gemini, Supabase)
+├── src/                      # React Frontend Application
+│   ├── assets/
+│   ├── clients/              # API fetch clients
+│   ├── config/               # Frontend config
+│   ├── components/           # Reusable UI & chat components
+│   ├── pages/                # Home, Chat, Architecture pages
+│   ├── hooks/                # Custom React hooks (useChat)
+│   ├── styles/               # CSS styles
+│   ├── App.jsx
+│   └── main.jsx
+├── docs/                     # Project & Technical Documentation
+│   ├── Architecture.md
+│   ├── ProblemStatement.md
+│   ├── TechnicalDocumentation.md
+│   ├── API.md
+│   ├── Database.md
+│   └── DevelopmentPlan.md
+└── README.md
+```
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+- Node.js (v18+)
+- Python (v3.10+)
+
+---
+
+### Running the Frontend
+
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Start dev server
+npm run dev
+```
+The frontend will run at `http://localhost:5173`.
+
+---
+
+### Running the Backend
+
+```bash
+# 1. Navigate to backend directory
+cd backend
+
+# 2. Install dependencies
+pip install -r requirements.txt
+
+# 3. Start FastAPI server
+uvicorn main:app --reload
+```
+The backend API server will run at `http://localhost:8000`.
+
+---
+
+## 📡 API Overview
+
+### POST `/api/chat`
+
+**Request:**
+```json
+{
+  "message": "My father is a farmer and I need scholarship",
+  "session_id": "123",
+  "language": "en"
+}
+```
+
+**Response:**
+```json
+{
+  "response": "Detailed guidance markdown response...",
+  "agents": ["Education", "Agriculture", "Government Schemes"],
+  "action_plan": [
+    {
+      "title": "Apply PM-KISAN",
+      "description": "Direct income support of ₹6,000/year",
+      "priority": "High"
+    }
+  ],
+  "sources": [
+    {
+      "name": "PM-KISAN Portal",
+      "url": "https://pmkisan.gov.in"
+    }
+  ]
+}
+```
+
+---
+
+## 🔮 Future Scope
+- WhatsApp bot integration for rural accessibility
+- Multilingual voice input and output in 22 Indian languages
+- DigiLocker API integration for automated document verification
+
+---
+
+## 👥 Team Members
+- **AI & Backend Development**: AI / Backend Lead
+- **Frontend Development**: Frontend & UX Lead
