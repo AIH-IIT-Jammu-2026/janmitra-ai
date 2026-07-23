@@ -7,7 +7,7 @@ on:
 
 jobs:
   test:
-    name: Run Backend Tests
+    name: "🤖 JanMitra AI — Backend Tests"
     runs-on: ubuntu-latest
 
     steps:
@@ -23,46 +23,4 @@ jobs:
         run: pip install fastapi uvicorn pydantic httpx pytest pytest-asyncio
 
       - name: Run Tests
-        id: run_tests
         run: python -m pytest backend/tests -v
-        continue-on-error: true
-
-      - name: Post Approved Comment
-        if: steps.run_tests.outcome == 'success'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ## ✅ PR Approved — All Tests Passed
-
-            **JanMitra AI CI Bot** reviewed this pull request.
-
-            | Check | Status |
-            |---|---|
-            | Backend Tests | ✅ Passed |
-            | pytest | ✅ All assertions passed |
-
-            This PR is **safe to merge** into `main`.
-
-      - name: Post Not Approved Comment
-        if: steps.run_tests.outcome == 'failure'
-        uses: peter-evans/create-or-update-comment@v4
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          issue-number: ${{ github.event.pull_request.number }}
-          body: |
-            ## ❌ PR Not Approved — Tests Failed
-
-            **JanMitra AI CI Bot** reviewed this pull request.
-
-            | Check | Status |
-            |---|---|
-            | Backend Tests | ❌ Failed |
-            | pytest | ❌ One or more assertions failed |
-
-            Please fix the failing tests before merging.
-
-      - name: Fail Job if Tests Failed
-        if: steps.run_tests.outcome == 'failure'
-        run: exit 1
