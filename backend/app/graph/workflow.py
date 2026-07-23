@@ -32,7 +32,7 @@ def expert_agents_node(state: AgentState) -> AgentState:
 def aggregator_node(state: AgentState) -> AgentState:
     logger.info("Executing Aggregator Node...")
     response_model = run_aggregator_agent(state["message"], state["agent_outputs"])
-    state["final_response"] = response_model.dict()
+    state["final_response"] = response_model.model_dump()
     return state
 
 def run_agent_workflow(message: str, session_id: str = "123", language: str = "en") -> dict:
