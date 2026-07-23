@@ -2,21 +2,27 @@ import os
 import time
 import logging
 
-import google.generativeai as genai
 from backend.app.core.config import settings
 
 logger = logging.getLogger("janmitra.gemini")
 logging.basicConfig(level=logging.INFO)
 
-MODEL_NAME = os.getenv("MODEL_NAME", "gemini-2.5-flash")
+MODEL_NAME = os.getenv("MODEL_NAME", "gemini-3.1-flash-lite")
 
-if not settings.GEMINI_API_KEY:
-    raise EnvironmentError(
-        "GEMINI_API_KEY not found. Make sure it is set in your .env file."
-    )
 
-genai.configure(api_key=settings.GEMINI_API_KEY)
-_model = genai.GenerativeModel(MODEL_NAME)
+def _get_model():
+    try:
+        import google.generativeai as genai
+    except ModuleNotFoundError:
+        logger.error("google-generativeai package is not installed")
+        return None
+
+    if not settings.GEMINI_API_KEY:
+        logger.error("GEMINI_API_KEY not set")
+        return None
+
+    genai.configure(api_key=settings.GEMINI_API_KEY)
+    return genai.GenerativeModel(MODEL_NAME)
 
 
 def call_gemini_api(prompt: str) -> str:
@@ -28,11 +34,15 @@ def call_gemini_api(prompt: str) -> str:
         logger.warning("call_gemini_api received an empty prompt")
         return ""
 
+    model = _get_model()
+    if model is None:
+        return ""
+
     max_retries = 3
     for attempt in range(1, max_retries + 1):
         try:
-            result = _model.generate_content(prompt)
-            if result and result.text:
+            result = model.generate_content(prompt)
+            if result and getattr(result, "text", None):
                 return result.text
             raise ValueError("Empty response from Gemini")
         except Exception as e:
