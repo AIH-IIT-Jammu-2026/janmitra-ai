@@ -1,6 +1,13 @@
 import os
 from pydantic import BaseModel
 
+try:
+    from dotenv import load_dotenv
+    # Attempt to load .env from backend root or working directory
+    load_dotenv(dotenv_path=os.path.join(os.path.dirname(__file__), "..", "..", ".env"))
+except ModuleNotFoundError:
+    pass
+
 class Settings(BaseModel):
     PROJECT_NAME: str = "JanMitra AI Backend"
     API_V1_STR: str = "/api"
