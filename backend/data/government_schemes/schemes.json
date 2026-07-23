@@ -1,0 +1,245 @@
+[
+  {
+    "id": "pm-kisan",
+    "name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+    "ministry": "Ministry of Agriculture & Farmers Welfare",
+    "category": "Agriculture",
+    "description": "Direct income support of ₹6,000 per year in three equal instalments of ₹2,000 each to land-holding farmer families.",
+    "eligibility": [
+      "Small and marginal farmers with cultivable land",
+      "Family income should be based on land holding criteria",
+      "All land-holding farmer families are eligible",
+      "Excluded: income tax payers, constitutional post holders, government employees"
+    ],
+    "benefits": "₹6,000/year credited directly to bank account (Aadhaar-linked)",
+    "documents": ["Aadhaar Card", "Land records / 7-12 Extract", "Bank passbook linked to Aadhaar", "Mobile number"],
+    "how_to_apply": "Apply at nearest Common Service Centre (CSC) or online at pmkisan.gov.in",
+    "portal": "https://pmkisan.gov.in",
+    "keywords": ["farmer", "kisan", "agriculture", "income support", "land", "kheti", "krishi", "fasal", "6000"]
+  },
+  {
+    "id": "pmay-gramin",
+    "name": "PM Awas Yojana Gramin (PMAY-G)",
+    "ministry": "Ministry of Rural Development",
+    "category": "Housing",
+    "description": "Financial assistance of ₹1.20 lakh (plain areas) or ₹1.30 lakh (hilly/difficult areas) for construction of pucca houses to rural homeless families.",
+    "eligibility": [
+      "Houseless families or families living in kutcha/dilapidated houses",
+      "Listed in Socio Economic Caste Census (SECC) 2011",
+      "SC/ST families, freed bonded labourers, minorities prioritized",
+      "Must not own a pucca house in any part of India"
+    ],
+    "benefits": "₹1.20-1.30 lakh for house construction + MGNREGS support",
+    "documents": ["Aadhaar Card", "BPL Certificate", "Income Certificate", "Land ownership proof", "Bank passbook"],
+    "how_to_apply": "Apply through Gram Panchayat or online at pmayg.nic.in",
+    "portal": "https://pmayg.nic.in",
+    "keywords": ["house", "home", "housing", "awas", "ghar", "shelter", "rural", "pucca", "kutcha"]
+  },
+  {
+    "id": "pmay-urban",
+    "name": "PM Awas Yojana Urban (PMAY-U)",
+    "ministry": "Ministry of Housing and Urban Affairs",
+    "category": "Housing",
+    "description": "Credit Linked Subsidy Scheme (CLSS) providing interest subsidy on home loans for Economically Weaker Section (EWS) and Low Income Group (LIG) urban beneficiaries.",
+    "eligibility": [
+      "EWS: Annual income up to ₹3 lakh",
+      "LIG: Annual income ₹3 lakh to ₹6 lakh",
+      "MIG-I: Annual income ₹6 lakh to ₹12 lakh",
+      "Must not own a pucca house in India"
+    ],
+    "benefits": "Interest subsidy up to 6.5% on home loans up to ₹6 lakh",
+    "documents": ["Aadhaar Card", "Income Certificate", "Property documents", "Bank account details"],
+    "how_to_apply": "Apply through banks, housing finance companies or pmaymis.gov.in",
+    "portal": "https://pmaymis.gov.in",
+    "keywords": ["urban housing", "home loan", "subsidy", "city", "flat", "apartment"]
+  },
+  {
+    "id": "pmgkay",
+    "name": "PM Garib Kalyan Anna Yojana (PMGKAY)",
+    "ministry": "Ministry of Consumer Affairs, Food and Public Distribution",
+    "category": "Food Security",
+    "description": "Free food grain distribution of 5 kg per person per month to beneficiaries under the National Food Security Act (NFSA).",
+    "eligibility": [
+      "Priority Household (PHH) ration card holders",
+      "Antyodaya Anna Yojana (AAY) card holders",
+      "Covered under National Food Security Act (NFSA)"
+    ],
+    "benefits": "5 kg free rice/wheat per person per month",
+    "documents": ["Ration Card", "Aadhaar Card"],
+    "how_to_apply": "No application needed. Collect from designated Fair Price Shop (FPS) with ration card.",
+    "portal": "https://dfpd.gov.in",
+    "keywords": ["ration", "food", "grain", "anaj", "hunger", "free food", "rice", "wheat"]
+  },
+  {
+    "id": "pmjdy",
+    "name": "PM Jan Dhan Yojana (PMJDY)",
+    "ministry": "Ministry of Finance",
+    "category": "Financial Inclusion",
+    "description": "Zero-balance bank account with RuPay debit card, ₹2 lakh accidental insurance, ₹30,000 life insurance, and ₹10,000 overdraft facility.",
+    "eligibility": [
+      "Any Indian citizen above 10 years of age",
+      "Does not have an existing bank account",
+      "No income requirement"
+    ],
+    "benefits": "Zero balance account + RuPay card + ₹2L accident insurance + ₹10K overdraft",
+    "documents": ["Aadhaar Card", "Passport photograph"],
+    "how_to_apply": "Visit any bank branch or Business Correspondent (BC) outlet",
+    "portal": "https://pmjdy.gov.in",
+    "keywords": ["bank account", "jan dhan", "banking", "financial inclusion", "zero balance", "rupay"]
+  },
+  {
+    "id": "pm-mudra",
+    "name": "PM Mudra Yojana (PMMY)",
+    "ministry": "Ministry of Finance",
+    "category": "Employment / Business",
+    "description": "Collateral-free micro-loans for small businesses. Shishu (up to ₹50,000), Kishore (₹50,000 to ₹5 lakh), Tarun (₹5 lakh to ₹10 lakh).",
+    "eligibility": [
+      "Non-corporate, non-farm small or micro enterprises",
+      "Individuals, proprietary firms, partnership firms",
+      "No prior loan default history"
+    ],
+    "benefits": "Loans up to ₹10 lakh without collateral for business purposes",
+    "documents": ["Aadhaar Card", "PAN Card", "Business plan / proof of existence", "Bank statements (6 months)"],
+    "how_to_apply": "Apply at any bank, NBFC, MFI branch or online at mudra.org.in",
+    "portal": "https://mudra.org.in",
+    "keywords": ["loan", "business", "mudra", "enterprise", "startup", "shop", "micro loan", "self employment"]
+  },
+  {
+    "id": "ayushman-bharat",
+    "name": "Ayushman Bharat PM-JAY",
+    "ministry": "Ministry of Health & Family Welfare",
+    "category": "Healthcare",
+    "description": "Cashless health insurance coverage of ₹5 lakh per family per year for secondary and tertiary hospitalisation at empanelled hospitals.",
+    "eligibility": [
+      "Bottom 40% of India's population as per SECC data",
+      "Rural: D1 to D5 deprivation categories in SECC",
+      "Urban: Occupational categories listed in SECC",
+      "No family size or age restrictions for beneficiaries"
+    ],
+    "benefits": "₹5 lakh/family/year cashless treatment at 25,000+ hospitals",
+    "documents": ["Aadhaar Card", "Ration Card or SECC letter", "Mobile number"],
+    "how_to_apply": "Check eligibility at pmjay.gov.in or visit nearest empanelled hospital",
+    "portal": "https://pmjay.gov.in",
+    "keywords": ["health", "hospital", "ayushman", "insurance", "medical", "treatment", "cashless", "PM-JAY"]
+  },
+  {
+    "id": "atal-pension",
+    "name": "Atal Pension Yojana (APY)",
+    "ministry": "Ministry of Finance / PFRDA",
+    "category": "Social Security",
+    "description": "Guaranteed pension of ₹1,000 to ₹5,000 per month after age 60 for unorganised sector workers.",
+    "eligibility": [
+      "Indian citizens aged 18-40 years",
+      "Must have a savings bank account",
+      "Not an income tax payer",
+      "Not covered under EPF/ESIC"
+    ],
+    "benefits": "Guaranteed monthly pension ₹1,000-₹5,000 after 60 years of age",
+    "documents": ["Aadhaar Card", "Bank account", "Mobile number"],
+    "how_to_apply": "Enroll through any bank branch, internet banking, or mobile banking app",
+    "portal": "https://npscra.nsdl.co.in/scheme-details.php",
+    "keywords": ["pension", "retirement", "old age", "atal", "APY", "unorganised worker"]
+  },
+  {
+    "id": "pm-shram-yogi",
+    "name": "PM Shram Yogi Maan-Dhan (PM-SYM)",
+    "ministry": "Ministry of Labour & Employment",
+    "category": "Social Security",
+    "description": "Voluntary pension scheme for unorganised workers with guaranteed monthly pension of ₹3,000 after age 60.",
+    "eligibility": [
+      "Unorganised sector workers aged 18-40 years",
+      "Monthly income up to ₹15,000",
+      "Not covered under ESIC, EPFO, NPS, or income tax"
+    ],
+    "benefits": "₹3,000/month guaranteed pension after 60 + ₹2 lakh family pension on death",
+    "documents": ["Aadhaar Card", "Savings bank account or Jan Dhan account", "Mobile number"],
+    "how_to_apply": "Enroll at nearest Common Service Centre (CSC) or maandhan.in",
+    "portal": "https://maandhan.in",
+    "keywords": ["worker", "labour", "mazdoor", "shram yogi", "informal", "unorganised", "daily wage"]
+  },
+  {
+    "id": "pm-fasal-bima",
+    "name": "PM Fasal Bima Yojana (PMFBY)",
+    "ministry": "Ministry of Agriculture & Farmers Welfare",
+    "category": "Agriculture",
+    "description": "Comprehensive crop insurance at very low premium (1.5-5%) protecting farmers against crop loss due to natural calamities, pests, and diseases.",
+    "eligibility": [
+      "All farmers growing notified crops in notified areas",
+      "Both loanee (compulsory) and non-loanee farmers",
+      "Sharecroppers and tenant farmers also eligible"
+    ],
+    "benefits": "Full insured amount on crop failure from natural causes",
+    "documents": ["Aadhaar Card", "Land records / 7-12 Extract", "Bank passbook", "Sowing certificate"],
+    "how_to_apply": "Apply at nearest bank, CSC, or online at pmfby.gov.in before cut-off date",
+    "portal": "https://pmfby.gov.in",
+    "keywords": ["crop insurance", "fasal bima", "natural disaster", "drought", "flood", "crop loss", "kharif", "rabi"]
+  },
+  {
+    "id": "nsp-scholarship",
+    "name": "National Scholarship Portal (NSP) Schemes",
+    "ministry": "Ministry of Electronics and IT",
+    "category": "Education",
+    "description": "Single platform for multiple central and state scholarships for Pre-Matric, Post-Matric, and Merit-cum-Means students.",
+    "eligibility": [
+      "Indian students at various education levels",
+      "Pre-Matric: Students from Class 1 to 10",
+      "Post-Matric: Students from Class 11 onwards",
+      "Family income criteria varies by scheme (₹1-2.5 lakh/year)"
+    ],
+    "benefits": "Scholarships from ₹1,000 to ₹20,000/year depending on scheme",
+    "documents": ["Aadhaar Card", "Mark sheets", "Income Certificate", "Bank passbook", "Caste Certificate (if applicable)"],
+    "how_to_apply": "Register and apply at scholarships.gov.in",
+    "portal": "https://scholarships.gov.in",
+    "keywords": ["scholarship", "student", "education", "college", "study", "fees", "NSP", "merit", "post-matric"]
+  },
+  {
+    "id": "pm-suraksha-bima",
+    "name": "PM Suraksha Bima Yojana (PMSBY)",
+    "ministry": "Ministry of Finance",
+    "category": "Insurance",
+    "description": "Accidental death and disability insurance coverage of ₹2 lakh at just ₹20/year premium.",
+    "eligibility": [
+      "Bank account holders aged 18-70 years",
+      "Savings bank account with Aadhaar",
+      "Auto-debit consent required annually"
+    ],
+    "benefits": "₹2 lakh on accidental death / full disability; ₹1 lakh on partial disability",
+    "documents": ["Aadhaar Card", "Bank account (savings)"],
+    "how_to_apply": "Enroll through bank branch, net banking, or mobile banking at ₹20/year",
+    "portal": "https://jansuraksha.gov.in",
+    "keywords": ["accident insurance", "suraksha bima", "disability", "accidental death", "cheap insurance", "20 rupees"]
+  },
+  {
+    "id": "pm-jeevan-jyoti",
+    "name": "PM Jeevan Jyoti Bima Yojana (PMJJBY)",
+    "ministry": "Ministry of Finance",
+    "category": "Insurance",
+    "description": "Life insurance coverage of ₹2 lakh for death from any cause at ₹436/year premium.",
+    "eligibility": [
+      "Bank account holders aged 18-50 years",
+      "Aadhaar-linked savings bank account",
+      "Annual auto-renewal with consent"
+    ],
+    "benefits": "₹2 lakh life insurance coverage for any cause of death",
+    "documents": ["Aadhaar Card", "Savings bank account"],
+    "how_to_apply": "Enroll through any bank branch or online banking at ₹436/year",
+    "portal": "https://jansuraksha.gov.in",
+    "keywords": ["life insurance", "jeevan jyoti", "death benefit", "family protection", "PMJJBY"]
+  },
+  {
+    "id": "soil-health-card",
+    "name": "Soil Health Card Scheme",
+    "ministry": "Ministry of Agriculture & Farmers Welfare",
+    "category": "Agriculture",
+    "description": "Free soil health cards issued to farmers with crop-wise recommendations for nutrients and fertilizers to improve productivity.",
+    "eligibility": [
+      "All farmers with agricultural land",
+      "No income restriction"
+    ],
+    "benefits": "Free soil testing and nutrient recommendations to improve yield",
+    "documents": ["Aadhaar Card", "Land records"],
+    "how_to_apply": "Contact nearest Krishi Vigyan Kendra (KVK) or Agriculture office",
+    "portal": "https://soilhealth.dac.gov.in",
+    "keywords": ["soil", "health card", "fertilizer", "nutrient", "farming advice", "crop yield", "KVK"]
+  }
+]
