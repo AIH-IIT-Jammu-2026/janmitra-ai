@@ -1,29 +1,28 @@
 # Dependencies & Builds
-node_modules
-dist
-build
+node_modules/
+dist/
+build/
 
-<<<<<<< HEAD
+# Python
+__pycache__/
+*.pyc
+.pytest_cache/
+venv/
+.venv/
+
+# Environment files
+.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-.env
-=======
-# Python
-__pycache__/
-*.pyc
-.pytest_cache/
-venv/
-.env
-__pycache__/
-*.pyc
+
 # Antigravity / IDE
 .system_generated/
->>>>>>> origin/tanu/test
