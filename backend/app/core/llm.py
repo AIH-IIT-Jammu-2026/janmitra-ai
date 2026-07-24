@@ -1,10 +1,12 @@
 from backend.app.core.config import settings
 from backend.app.core.logging import logger
+from backend.app.clients.gemini import call_gemini_api
+
 
 def get_llm_client():
     """
-    Initialize Gemini or LLM client instance using API key
+    Returns a callable LLM client function that agents can use
+    to send a prompt and get back a text response.
     """
     logger.info("Initializing LLM client...")
-    # LLM Initialization logic goes here
-    pass
+    return call_gemini_api
