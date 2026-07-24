@@ -1,8 +1,5 @@
 import os
 from pydantic import BaseModel
-from dotenv import load_dotenv
-
-load_dotenv(dotenv_path="backend/.env")
 
 try:
     from dotenv import load_dotenv
