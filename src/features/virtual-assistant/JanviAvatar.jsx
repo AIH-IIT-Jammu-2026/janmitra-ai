@@ -1,33 +1,8 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { motion } from 'framer-motion'
 import janviAvatarReal from '../../assets/janvi_avatar_real.png'
 
 export default function JanviAvatar({ state = 'idle' }) {
-  const [phonemeStep, setPhonemeStep] = useState(0)
-  const [blink, setBlink] = useState(false)
-
-  // 1. Phoneme Mouth Morphing Loop when Speaking (A, E, O, M mouth shapes)
-  useEffect(() => {
-    let timer
-    if (state === 'speaking') {
-      timer = setInterval(() => {
-        setPhonemeStep((prev) => (prev + 1) % 4)
-      }, 110)
-    } else {
-      setPhonemeStep(0)
-    }
-    return () => clearInterval(timer)
-  }, [state])
-
-  // 2. Natural Eyelid Blinking Loop (Blinks every 3.2s)
-  useEffect(() => {
-    const blinkTimer = setInterval(() => {
-      setBlink(true)
-      setTimeout(() => setBlink(false), 170)
-    }, 3200)
-    return () => clearInterval(blinkTimer)
-  }, [])
-
   // State Visual Configurations
   const stateConfig = {
     idle: {
@@ -73,14 +48,6 @@ export default function JanviAvatar({ state = 'idle' }) {
   }
 
   const current = stateConfig[state] || stateConfig.idle
-
-  // Phoneme Mouth SVG Overlay Paths
-  const mouthPaths = [
-    'M 43 54 Q 50 58 57 54 Z', // Closed / Neutral M
-    'M 41 53 Q 50 66 59 53 Q 50 58 41 53 Z', // Wide Open A
-    'M 42 53 Q 50 57 58 53 Q 50 63 42 53 Z', // Smile Open E
-    'M 45 53 Q 50 63 55 53 Q 50 57 45 53 Z', // Rounded O
-  ]
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: '100%' }}>
@@ -172,7 +139,7 @@ export default function JanviAvatar({ state = 'idle' }) {
           />
         )}
 
-        {/* Real Janvi AI Girl Image Frame (Photorealistic AI Portrait in JanMitra Polo) */}
+        {/* Real Janvi AI Girl Image Frame (Clean Photorealistic Portrait in JanMitra Polo) */}
         <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <img
             src={janviAvatarReal}
@@ -185,30 +152,6 @@ export default function JanviAvatar({ state = 'idle' }) {
               filter: state === 'thinking' ? 'brightness(1.1) contrast(1.05)' : 'none',
             }}
           />
-
-          {/* SVG Expression Overlay (Eye Blinking & Lip Sync mouth movements over photorealistic face) */}
-          <svg
-            width="100%"
-            height="100%"
-            viewBox="0 0 100 120"
-            fill="none"
-            style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
-          >
-            {/* Eye Blinking Animation Overlay */}
-            {blink && (
-              <>
-                <ellipse cx="38" cy="48" rx="7" ry="5" fill="#1A1829" />
-                <ellipse cx="62" cy="48" rx="7" ry="5" fill="#1A1829" />
-                <line x1="31" y1="48" x2="45" y2="48" stroke="#3D291F" strokeWidth="2.5" strokeLinecap="round" />
-                <line x1="55" y1="48" x2="69" y2="48" stroke="#3D291F" strokeWidth="2.5" strokeLinecap="round" />
-              </>
-            )}
-
-            {/* Lip Sync Phoneme Mouth Overlay when Speaking */}
-            {state === 'speaking' && (
-              <path d={mouthPaths[phonemeStep]} fill="#E11D48" stroke="#9F1239" strokeWidth="1" />
-            )}
-          </svg>
         </div>
 
         {/* Audio Equalizer Synced when Janvi is Speaking */}
