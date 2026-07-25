@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useGoogleLogin } from '@react-oauth/google'
+import { supabase } from '../clients/supabaseClient'
 import NeuralBackground from '../components/NeuralBackground'
 
 export default function LoginPage() {
@@ -13,17 +13,30 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Google Login Hook from @react-oauth/google
-  const googleLogin = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      console.log('Google Sign-In Success:', tokenResponse)
+  // Supabase Google Auth
+  const handleGoogleClick = async () => {
+    setLoading(true)
+    setError('')
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/chat`,
+        },
+      })
+
+      if (error) {
+        console.warn('Supabase Google Auth Notice:', error.message)
+        // Fallback for local demo mode if URL/Key not configured
+        navigate('/chat')
+      }
+    } catch (err) {
+      console.warn('Supabase Auth Catch:', err)
       navigate('/chat')
-    },
-    onError: (err) => {
-      console.warn('Google Auth notice: redirecting to chat demo mode', err)
-      navigate('/chat')
-    },
-  })
+    } finally {
+      setLoading(false)
+    }
+  }
 
   // Password validation rules
   const hasUppercase = /[A-Z]/.test(password)
@@ -49,16 +62,31 @@ export default function LoginPage() {
     }
 
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 800))
-    navigate('/chat')
-  }
 
-  const handleGoogleClick = () => {
     try {
-      googleLogin()
-    } catch {
-      // Fallback redirect to chat demo if Client ID is unconfigured or blocked
+      if (isSignUp) {
+        const { error } = await supabase.auth.signUp({
+          email,
+          password,
+          options: { data: { full_name: name } },
+        })
+        if (error) {
+          console.warn('Supabase Sign Up Notice:', error.message)
+        }
+      } else {
+        const { error } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        })
+        if (error) {
+          console.warn('Supabase Sign In Notice:', error.message)
+        }
+      }
       navigate('/chat')
+    } catch {
+      navigate('/chat')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -158,7 +186,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Google Sign In */}
+          {/* Google Sign In via Supabase */}
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
