@@ -1,16 +1,8 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { useGoogleLogin } from '@react-oauth/google'
 import { supabase, isSupabaseConfigured } from '../clients/supabaseClient'
 import NeuralBackground from '../components/NeuralBackground'
-
-const rawGoogleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
-const isRealGoogleClientId =
-  Boolean(rawGoogleClientId) &&
-  !rawGoogleClientId.includes('your-google-client-id') &&
-  !rawGoogleClientId.includes('dummy-client-id') &&
-  rawGoogleClientId.endsWith('.apps.googleusercontent.com')
 
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false)
@@ -21,51 +13,29 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Google OAuth Popup Hook
-  const googlePopupLogin = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      console.log('Google Auth Success:', tokenResponse)
-      navigate('/chat')
-    },
-    onError: (err) => {
-      console.warn('Google Auth Popup Notice:', err)
-      navigate('/chat')
-    },
-  })
-
-  // Google Sign In Handler
+  // Google Sign In Handler (Direct Supabase OAuth)
   const handleGoogleClick = async () => {
     setLoading(true)
     setError('')
 
-    // 1. If Supabase is configured with real keys, use Supabase OAuth
-    if (isSupabaseConfigured) {
-      try {
-        const { error } = await supabase.auth.signInWithOAuth({
-          provider: 'google',
-          options: {
-            redirectTo: `${window.location.origin}/chat`,
-          },
-        })
-        if (!error) return
-      } catch (err) {
-        console.warn('Supabase OAuth Error:', err)
-      }
-    }
+    try {
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/chat`,
+        },
+      })
 
-    // 2. If a real Google Client ID is configured in .env, trigger Google OAuth popup
-    if (isRealGoogleClientId) {
-      try {
-        googlePopupLogin()
-        return
-      } catch (err) {
-        console.warn('Google Popup Trigger Error:', err)
+      if (error) {
+        console.error('Supabase Google OAuth Error:', error)
+        setError(`Google Auth Error: ${error.message}. Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in .env`)
       }
+    } catch (err) {
+      console.error('Google OAuth Trigger Exception:', err)
+      setError('Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file to enable Google authentication.')
+    } finally {
+      setLoading(false)
     }
-
-    // 3. Clean demo sign in (bypasses Google Error 401 popup for placeholder keys)
-    setLoading(false)
-    navigate('/chat')
   }
 
   // Password validation rules
@@ -96,21 +66,32 @@ export default function LoginPage() {
     if (isSupabaseConfigured) {
       try {
         if (isSignUp) {
-          await supabase.auth.signUp({
+          const { error } = await supabase.auth.signUp({
             email,
             password,
             options: { data: { full_name: name } },
           })
+          if (error) {
+            setError(error.message)
+            setLoading(false)
+            return
+          }
         } else {
-          await supabase.auth.signInWithPassword({
+          const { error } = await supabase.auth.signInWithPassword({
             email,
             password,
           })
+          if (error) {
+            setError(error.message)
+            setLoading(false)
+            return
+          }
         }
-      } catch {
-        // Fallback
+      } catch (err) {
+        console.warn('Auth fallback active:', err)
       }
     }
+
     setLoading(false)
     navigate('/chat')
   }
