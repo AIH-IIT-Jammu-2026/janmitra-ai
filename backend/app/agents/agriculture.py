@@ -2,23 +2,14 @@ import os
 import json
 from backend.app.core.logging import logger
 from backend.app.clients.gemini import call_gemini_api
+from backend.app.rag.retriever import retrieve_relevant_schemes, retriever_instance
+
+# Expose domain knowledge base for tests/backward compatibility
+AGRICULTURE_DB: list[dict] = [doc for doc in retriever_instance.documents if doc.get("_domain") == "agriculture"]
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 _AGENT_DIR   = os.path.dirname(__file__)
 _PROMPT_PATH = os.path.normpath(os.path.join(_AGENT_DIR, "..", "prompts", "agriculture.txt"))
-_DATA_PATH   = os.path.normpath(os.path.join(_AGENT_DIR, "..", "..", "data", "agriculture", "agriculture.json"))
-
-# ── Load knowledge base once at startup ────────────────────────────────────────
-def _load_knowledge_base() -> list[dict]:
-    try:
-        with open(_DATA_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logger.error(f"[Agriculture] Could not load knowledge base: {e}")
-        return []
-
-AGRICULTURE_DB: list[dict] = _load_knowledge_base()
-logger.info(f"[Agriculture] Loaded {len(AGRICULTURE_DB)} agriculture entries from knowledge base")
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 def _load_prompt() -> str:
@@ -30,43 +21,8 @@ def _load_prompt() -> str:
         return "You are the Agriculture Expert Agent. Help farmers with schemes, subsidies, and agricultural advice."
 
 def _search_agriculture(message: str, top_k: int = 4) -> list[dict]:
-    """Keyword and word-level search over agriculture knowledge base (RAG placeholder)."""
-    msg_lower = message.lower()
-    msg_words = set(msg_lower.split())
-    scored: list[tuple[int, dict]] = []
-
-    for entry in AGRICULTURE_DB:
-        score = 0
-        keywords = entry.get("keywords", [])
-
-        # Check phrase match & word matches in keywords
-        for kw in keywords:
-            kw_lower = kw.lower()
-            if kw_lower in msg_lower:
-                score += 3
-            else:
-                kw_words = set(kw_lower.split())
-                common = kw_words.intersection(msg_words)
-                score += len(common)
-
-        # Check name & category matches
-        name_words = set(entry.get("name", "").lower().split())
-        score += len(name_words.intersection(msg_words)) * 2
-
-        if entry.get("category", "").lower() in msg_lower:
-            score += 2
-
-        if score > 0:
-            scored.append((score, entry))
-
-    scored.sort(key=lambda x: x[0], reverse=True)
-    results = [s for _, s in scored[:top_k]]
-
-    if not results:
-        # Default fallback to PM-KISAN, PMFBY, KCC
-        results = AGRICULTURE_DB[:3]
-
-    return results
+    """Semantic vector search using RAG engine over Agriculture knowledge base."""
+    return retrieve_relevant_schemes(message, domain="agriculture", top_k=top_k)
 
 def _build_context_text(entries: list[dict]) -> str:
     """Formats matched agriculture entries into prompt-ready context."""
@@ -121,20 +77,20 @@ def _build_fallback_response(entries: list[dict]) -> dict:
 def run_agriculture_agent(message: str) -> dict:
     """
     Agriculture Expert Agent.
-    1. Searches agriculture knowledge base for relevant schemes, subsidies, or guidance.
-    2. Sends Gemini a system prompt + context + user query.
+    1. Searches agriculture knowledge base via RAG vector engine.
+    2. Sends Gemini a system prompt + RAG context + user query.
     3. Falls back to structured knowledge base response if LLM is offline.
     """
     logger.info(f"[Agriculture Agent] Processing: '{message}'")
 
     matched = _search_agriculture(message)
-    logger.info(f"[Agriculture Agent] Matched: {[e['name'] for e in matched]}")
+    logger.info(f"[Agriculture Agent] RAG matched: {[e['name'] for e in matched]}")
 
     system_prompt = _load_prompt()
     context_text  = _build_context_text(matched)
     full_prompt   = (
         f"{system_prompt}\n\n"
-        f"--- Relevant Agriculture Schemes from Knowledge Base ---\n{context_text}\n\n"
+        f"--- Relevant Agriculture Schemes from RAG Retrieval ---\n{context_text}\n\n"
         f"--- Farmer / Citizen Query ---\n\"{message}\"\n\n"
         f"Provide a helpful, practical response using the data above:"
     )
@@ -149,7 +105,7 @@ def run_agriculture_agent(message: str) -> dict:
                     "description": f"Required: {', '.join(e['documents'][:2])}. {e['how_to_apply']}",
                     "priority": "High"
                 }
-                for s in matched
+                for e in matched
             ]
             action_items.append({
                 "title": "Visit Nearest KVK / Agriculture Officer",
