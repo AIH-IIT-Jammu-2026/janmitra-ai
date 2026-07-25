@@ -9,6 +9,7 @@ import DocumentUploadModal from '../components/chat/DocumentUploadModal'
 import { sendChatMessage } from '../clients/chatClient'
 import { startSpeechRecognition } from '../utils/speechRecognition'
 import { useLanguage } from '../context/LanguageContext'
+import { useAssistant } from '../context/AssistantContext'
 
 const SUGGESTED_PROMPTS = [
   { label: '🌾 PM-KISAN & Farmer Schemes', query: 'I am a farmer from Maharashtra. Which government schemes am I eligible for?' },
@@ -20,6 +21,7 @@ const SUGGESTED_PROMPTS = [
 export default function ChatPage() {
   const location = useLocation()
   const { t, currentLanguage } = useLanguage()
+  const { openAssistant } = useAssistant()
   const [messages, setMessages] = useState([
     {
       id: 0,
@@ -169,6 +171,28 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
               </div>
             </div>
           </div>
+
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={openAssistant}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 6,
+              padding: '8px 16px',
+              background: 'rgba(6,182,212,0.15)',
+              border: '1px solid rgba(6,182,212,0.4)',
+              borderRadius: 12,
+              color: '#67E8F9',
+              fontSize: 13,
+              fontWeight: 700,
+              cursor: 'pointer',
+              boxShadow: '0 0 16px rgba(6,182,212,0.3)',
+            }}
+          >
+            🤝 Get Live AI Assistance
+          </motion.button>
         </div>
 
         {/* Chat Messages List */}

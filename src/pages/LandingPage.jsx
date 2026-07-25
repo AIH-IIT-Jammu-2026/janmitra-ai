@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import NeuralBackground from '../components/NeuralBackground'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
 import { useLanguage } from '../context/LanguageContext'
+import { useAssistant } from '../context/AssistantContext'
 
 const FEATURES = [
   { icon: '🤖', title: 'Multi-Agent AI', desc: '7 specialized AI agents work together to provide complete citizen assistance across all government domains', color: '#2563EB' },
@@ -50,6 +51,7 @@ const FAQS = [
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const { t } = useLanguage()
+  const { openAssistant } = useAssistant()
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50)
@@ -113,6 +115,26 @@ function Navbar() {
 
         {/* Global Language Switcher */}
         <LanguageSwitcher />
+
+        <button
+          onClick={openAssistant}
+          style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 6,
+            padding: '8px 16px',
+            background: 'rgba(6,182,212,0.15)',
+            border: '1px solid rgba(6,182,212,0.4)',
+            borderRadius: 10,
+            color: '#67E8F9',
+            fontSize: 13,
+            fontWeight: 700,
+            cursor: 'pointer',
+            boxShadow: '0 0 16px rgba(6,182,212,0.25)',
+          }}
+        >
+          👩 Talk to Janvi
+        </button>
 
         <Link
           to="/signup"
