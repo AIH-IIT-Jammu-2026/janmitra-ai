@@ -437,11 +437,28 @@ export default function VirtualAssistantModal() {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
                     <div style={{ fontSize: 13.5, fontWeight: 800, color: '#38BDF8' }}>👩 Janvi Spoken Guidance</div>
-                    {avatarState === 'speaking' && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#10B981', fontSize: 11.5, fontWeight: 700 }}>
-                        <span>🔊 Speaking...</span>
-                      </div>
-                    )}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <button
+                        onClick={() => speakResponse(lastAssistantMessage.text)}
+                        style={{
+                          padding: '4px 10px',
+                          borderRadius: 10,
+                          background: 'rgba(56,189,248,0.15)',
+                          border: '1px solid rgba(56,189,248,0.3)',
+                          color: '#67E8F9',
+                          fontSize: 11,
+                          fontWeight: 600,
+                          cursor: 'pointer',
+                        }}
+                      >
+                        🔊 Listen / Replay Voice
+                      </button>
+                      {avatarState === 'speaking' && (
+                        <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#10B981', fontSize: 11.5, fontWeight: 700 }}>
+                          <span>🔊 Speaking...</span>
+                        </div>
+                      )}
+                    </div>
                   </div>
                   <p style={{ fontSize: 14.5, lineHeight: 1.55, color: '#F0F6FF', fontWeight: 500, margin: 0 }}>
                     "{lastAssistantMessage.text}"

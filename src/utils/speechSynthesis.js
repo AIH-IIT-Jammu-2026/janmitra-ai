@@ -1,10 +1,21 @@
 import { supportsSpeechSynthesis } from './browserSpeechSupport'
 
-let currentUtterance = null
+let cachedVoices = []
+
+if (typeof window !== 'undefined' && supportsSpeechSynthesis()) {
+  cachedVoices = window.speechSynthesis.getVoices()
+  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+    window.speechSynthesis.onvoiceschanged = () => {
+      cachedVoices = window.speechSynthesis.getVoices()
+    }
+  }
+}
 
 export function getAvailableVoices() {
   if (!supportsSpeechSynthesis()) return []
-  return window.speechSynthesis.getVoices()
+  if (cachedVoices.length > 0) return cachedVoices
+  cachedVoices = window.speechSynthesis.getVoices()
+  return cachedVoices
 }
 
 export function findBestVoiceForLanguage(langCode) {
@@ -20,32 +31,49 @@ export function findBestVoiceForLanguage(langCode) {
   const langPrefixMatch = voices.find((v) => v.lang.startsWith(prefix))
   if (langPrefixMatch) return langPrefixMatch
 
-  return null
+  // 3. Fallback to English / default voice
+  return voices.find((v) => v.lang.startsWith('en')) || voices[0]
 }
 
-export function speakText(text, langCode = 'hi-IN', rate = 1.0, onEndCallback = null) {
+export function speakText(text, langCode = 'en-IN', onStartCallback = null, onEndCallback = null, rate = 1.0) {
   if (!supportsSpeechSynthesis()) return false
 
-  window.speechSynthesis.cancel() // Stop active speech
+  try {
+    // Resume audio context if paused (Chrome/Edge autoplay policy on Windows)
+    if (window.speechSynthesis.paused) {
+      window.speechSynthesis.resume()
+    }
+    window.speechSynthesis.cancel() // Stop previous speech
 
-  const cleanText = text.replace(/[*#_`~]/g, '')
-  const utterance = new SpeechSynthesisUtterance(cleanText)
-  utterance.lang = langCode
-  utterance.rate = rate
+    const cleanText = text.replace(/[*#_`~]/g, '')
+    const utterance = new SpeechSynthesisUtterance(cleanText)
+    utterance.lang = langCode || 'en-IN'
+    utterance.rate = typeof rate === 'number' ? rate : 1.0
 
-  const voice = findBestVoiceForLanguage(langCode)
-  if (voice) {
-    utterance.voice = voice
+    const voice = findBestVoiceForLanguage(langCode)
+    if (voice) {
+      utterance.voice = voice
+    }
+
+    if (onStartCallback) {
+      utterance.onstart = onStartCallback
+    }
+
+    if (onEndCallback) {
+      utterance.onend = onEndCallback
+      utterance.onerror = (err) => {
+        console.warn('Utterance speech error:', err)
+        onEndCallback()
+      }
+    }
+
+    window.speechSynthesis.speak(utterance)
+    return true
+  } catch (err) {
+    console.warn('Error in speakText:', err)
+    if (onEndCallback) onEndCallback()
+    return false
   }
-
-  if (onEndCallback) {
-    utterance.onend = onEndCallback
-    utterance.onerror = onEndCallback
-  }
-
-  currentUtterance = utterance
-  window.speechSynthesis.speak(utterance)
-  return true
 }
 
 export function pauseSpeech() {

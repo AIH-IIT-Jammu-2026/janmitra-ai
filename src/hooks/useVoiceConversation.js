@@ -43,18 +43,15 @@ export function useVoiceConversation() {
     speakText(
       text,
       assistantLanguage,
-      () => {},
+      () => {
+        setAvatarState('speaking')
+      },
       () => {
         setAvatarState('idle')
         setThinkingStep('')
         if (onEnd) onEnd()
       },
-      (err) => {
-        console.warn('Speech synthesis error:', err)
-        setAvatarState('idle')
-        setThinkingStep('')
-        if (onEnd) onEnd()
-      }
+      1.0
     )
   }, [assistantLanguage, setAvatarState, setThinkingStep])
 
