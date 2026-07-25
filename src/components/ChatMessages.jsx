@@ -6,6 +6,7 @@ import ActionPlan from './chat/ActionPlan'
 import SourceCards from './chat/SourceCards'
 import EligibilityCard from './chat/EligibilityCard'
 import VoicePlayerBar from './chat/VoicePlayerBar'
+import PDFExportButton from './chat/PDFExportButton'
 
 function TypingAnimation() {
   return (
@@ -152,9 +153,12 @@ export function AIMessage({ message }) {
               </ReactMarkdown>
             </div>
 
-            {/* 3. Voice Player Bar */}
+            {/* 3. Action Toolbar (Voice Player & PDF Export) */}
             {contentText && (
-              <VoicePlayerBar messageId={messageId} originalText={contentText} />
+              <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginTop: 12 }}>
+                <VoicePlayerBar messageId={messageId} originalText={contentText} />
+                <PDFExportButton messageData={{ ...message, text: contentText }} />
+              </div>
             )}
 
             {/* 4. Document AI Eligibility Card */}
