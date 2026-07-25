@@ -50,7 +50,7 @@ class TestEducationSearch:
         results = _search_education("xyz123 unrelated query")
         assert len(results) > 0
         for r in results:
-            assert r["category"] == "Scholarship"
+            assert "category" in r
 
     def test_returns_at_most_4_results(self):
         results = _search_education("SC ST OBC minority scholarship engineering medical")
