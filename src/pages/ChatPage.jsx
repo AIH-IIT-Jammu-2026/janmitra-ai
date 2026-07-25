@@ -7,6 +7,7 @@ import { UserMessage, AIMessage, TypingAnimation } from '../components/ChatMessa
 import LoadingOverlay from '../components/chat/LoadingOverlay'
 import DocumentUploadModal from '../components/chat/DocumentUploadModal'
 import { sendChatMessage } from '../clients/chatClient'
+import { startSpeechRecognition } from '../utils/speechRecognition'
 
 const SUGGESTED_PROMPTS = [
   { label: '🌾 PM-KISAN & Farmer Schemes', query: 'I am a farmer from Maharashtra. Which government schemes am I eligible for?' },
@@ -33,7 +34,7 @@ export default function ChatPage() {
 
 I am your intelligent multi-agent citizen assistant. Ask me anything regarding **Government Schemes, Healthcare, Education, Employment, Agriculture, or Legal Guidance**.
 
-*Powered by LangGraph multi-agent orchestration, Gemini Vision Document AI, and RAG vector retrieval.*`,
+*Powered by LangGraph multi-agent orchestration, Multilingual Voice TTS, and Gemini Vision Document AI.*`,
     }
   ])
   const [input, setInput] = useState('')
@@ -119,32 +120,21 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
   }
 
   const handleVoiceInput = () => {
-    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-      alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.')
-      return
-    }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
-    const recognition = new SpeechRecognition()
-    recognition.lang = 'en-IN'
-    recognition.interimResults = false
-
     setListening(true)
-    recognition.start()
-
-    recognition.onresult = (event) => {
-      const transcript = event.results[0][0].transcript
-      setInput(transcript)
-      setListening(false)
-    }
-
-    recognition.onerror = () => {
-      setListening(false)
-    }
-
-    recognition.onend = () => {
-      setListening(false)
-    }
+    startSpeechRecognition(
+      'en-IN',
+      (res) => {
+        if (res && res.text) {
+          setInput(res.text)
+        }
+        setListening(false)
+      },
+      (err) => {
+        console.warn('Speech Recognition notice:', err)
+        setListening(false)
+      },
+      () => setListening(false)
+    )
   }
 
   return (
@@ -173,7 +163,7 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
               <div style={{ fontSize: 14, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif' }}>JanMitra AI Assistant</div>
               <div style={{ fontSize: 11, color: 'rgba(240,246,255,0.45)', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block', boxShadow: '0 0 6px #34D399' }} />
-                Online · Vision Document AI & Multi-Agent RAG Active
+                Online · Voice-to-Voice TTS & Multi-Agent Active
               </div>
             </div>
           </div>

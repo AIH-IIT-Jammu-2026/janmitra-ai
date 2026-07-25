@@ -1,5 +1,9 @@
 import io
-from PIL import Image
+try:
+    from PIL import Image
+    HAS_PIL = True
+except ImportError:
+    HAS_PIL = False
 
 ALLOWED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".pdf"}
 MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024  # 10 MB
@@ -25,8 +29,8 @@ def validate_document(filename: str, file_bytes: bytes) -> dict:
 
     file_type = "pdf" if ext == ".pdf" else "image"
 
-    # For images, verify image integrity using Pillow
-    if file_type == "image":
+    # For images, verify image integrity using Pillow if available
+    if file_type == "image" and HAS_PIL:
         try:
             img = Image.open(io.BytesIO(file_bytes))
             img.verify()
