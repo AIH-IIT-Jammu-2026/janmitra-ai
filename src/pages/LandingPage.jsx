@@ -2,6 +2,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import NeuralBackground from '../components/NeuralBackground'
+import LanguageSwitcher from '../components/common/LanguageSwitcher'
+import { useLanguage } from '../context/LanguageContext'
 
 const FEATURES = [
   { icon: '🤖', title: 'Multi-Agent AI', desc: '7 specialized AI agents work together to provide complete citizen assistance across all government domains', color: '#2563EB' },
@@ -47,6 +49,8 @@ const FAQS = [
 
 function Navbar() {
   const [scrolled, setScrolled] = useState(false)
+  const { t } = useLanguage()
+
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 50)
     window.addEventListener('scroll', handler)
@@ -93,19 +97,23 @@ function Navbar() {
           JanMitra AI
         </span>
       </div>
-      <div style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
+      <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
         <a href="#features" style={{ color: 'rgba(240,246,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
           Features
         </a>
         <a href="#how-it-works" style={{ color: 'rgba(240,246,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
-          How It Works
+          {t('how_it_works')}
         </a>
         <a href="#architecture" style={{ color: 'rgba(240,246,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
-          Architecture
+          {t('architecture')}
         </a>
         <a href="#faq" style={{ color: 'rgba(240,246,255,0.7)', textDecoration: 'none', fontSize: 14 }}>
           FAQ
         </a>
+
+        {/* Global Language Switcher */}
+        <LanguageSwitcher />
+
         <Link
           to="/signup"
           style={{
@@ -119,7 +127,7 @@ function Navbar() {
             boxShadow: '0 0 16px rgba(37,99,235,0.4)',
           }}
         >
-          Get Started
+          {t('get_started')}
         </Link>
       </div>
     </motion.nav>
@@ -128,6 +136,7 @@ function Navbar() {
 
 export default function LandingPage() {
   const [openFaq, setOpenFaq] = useState(null)
+  const { t } = useLanguage()
 
   return (
     <div style={{ position: 'relative', background: 'linear-gradient(180deg, #040d1a 0%, #071A35 40%, #040d1a 100%)', minHeight: '100vh' }}>
@@ -163,7 +172,7 @@ export default function LandingPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
               style={{
-                fontSize: 'clamp(40px, 6.5vw, 76px)',
+                fontSize: 'clamp(36px, 6vw, 72px)',
                 fontWeight: 900,
                 lineHeight: 1.1,
                 marginBottom: 24,
@@ -172,9 +181,7 @@ export default function LandingPage() {
                 color: '#F0F6FF',
               }}
             >
-              One AI.<br />
-              <span style={{ color: '#60A5FA' }}>Every Citizen Service.</span><br />
-              Anytime. In Any Language.
+              {t('hero_title')}
             </motion.h1>
 
             <motion.p
@@ -190,7 +197,7 @@ export default function LandingPage() {
                 margin: '0 auto 36px',
               }}
             >
-              JanMitra AI helps citizens access government schemes, healthcare, education, employment, agriculture, legal assistance, and emergency services through one intelligent AI assistant.
+              {t('hero_subtitle')}
             </motion.p>
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 48 }}>
@@ -208,7 +215,7 @@ export default function LandingPage() {
                   fontFamily: 'Space Grotesk, sans-serif',
                 }}
               >
-                🚀 Get Started
+                🚀 {t('get_started')}
               </Link>
               <a
                 href="#how-it-works"
@@ -311,7 +318,7 @@ export default function LandingPage() {
         <section id="how-it-works" style={{ padding: '80px 40px', maxWidth: 950, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <span style={{ fontSize: 12, color: '#60A5FA', fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase' }}>
-              How It Works
+              {t('how_it_works')}
             </span>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif', marginTop: 8 }}>
               Simple. Intelligent. Instant.
@@ -352,7 +359,7 @@ export default function LandingPage() {
               AI Agents
             </span>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif', marginTop: 8 }}>
-              7 Expert AI Agents Working For You
+              {t('expert_agents')}
             </h2>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16 }}>
@@ -379,7 +386,7 @@ export default function LandingPage() {
         <section id="architecture" style={{ padding: '80px 40px', maxWidth: 1000, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <span style={{ fontSize: 12, color: '#60A5FA', fontWeight: 600, letterSpacing: 2, textTransform: 'uppercase' }}>
-              Architecture
+              {t('architecture')}
             </span>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif', marginTop: 8 }}>
               Real Multi-Agent Pipeline
@@ -414,7 +421,7 @@ export default function LandingPage() {
         <section id="faq" style={{ padding: '80px 40px', maxWidth: 750, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 44 }}>
             <h2 style={{ fontSize: 36, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif' }}>
-              Frequently Asked Questions
+              {t('faq_title')}
             </h2>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>

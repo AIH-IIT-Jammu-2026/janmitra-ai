@@ -1,14 +1,17 @@
 import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
-
-const NAV_ITEMS = [
-  { icon: '🏠', label: 'Home', path: '/' },
-  { icon: '💬', label: 'AI Assistant', path: '/chat' },
-  { icon: '🧠', label: 'Architecture', path: '/architecture' },
-]
+import { useLanguage } from '../../context/LanguageContext'
+import LanguageSwitcher from '../common/LanguageSwitcher'
 
 export default function Sidebar() {
   const location = useLocation()
+  const { t } = useLanguage()
+
+  const NAV_ITEMS = [
+    { icon: '🏠', label: t('home'), path: '/' },
+    { icon: '💬', label: t('chat'), path: '/chat' },
+    { icon: '🧠', label: t('architecture'), path: '/architecture' },
+  ]
 
   return (
     <div
@@ -51,6 +54,11 @@ export default function Sidebar() {
             </div>
           </div>
         </Link>
+      </div>
+
+      {/* Language Switcher in Sidebar */}
+      <div style={{ padding: '12px 20px', borderBottom: '1px solid rgba(56,189,248,0.08)' }}>
+        <LanguageSwitcher />
       </div>
 
       {/* Navigation */}
