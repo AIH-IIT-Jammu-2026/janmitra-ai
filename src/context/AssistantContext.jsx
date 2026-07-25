@@ -12,11 +12,29 @@ export function AssistantProvider({ children }) {
   const [contextChips, setContextChips] = useState(['🌐 Citizen Assistant', '🤖 Multi-Agent Active'])
   const [currentGoal, setCurrentGoal] = useState({ title: 'Citizen Guidance', progress: 25, nextStep: 'Ask a question or share screen' })
   const [isScreenSharing, setIsScreenSharing] = useState(false)
-  const [thinkingStep, setThinkingStep] = useState('') // e.g. "👀 Understanding screen..."
+  const [thinkingStep, setThinkingStep] = useState('')
   const [sessionSummary, setSessionSummary] = useState(null)
+
+  // Phase 11 & Phase 12 Additions: Multimodal Timeline Log & Smart Follow-ups
+  const [timelineEvents, setTimelineEvents] = useState([
+    { time: '00:01', label: 'Session Started', icon: '🚀' },
+    { time: '00:02', label: 'Multi-Agent Router Active', icon: '🔀' },
+  ])
+  const [smartFollowups, setSmartFollowups] = useState([
+    'Fill the next section with me',
+    'Explain in Marathi / Hindi',
+    'Download Action Plan checklist',
+  ])
+  const [currentWebsiteState, setCurrentWebsiteState] = useState('PM-KISAN Registration Portal')
 
   const openAssistant = () => setIsOpen(true)
   const closeAssistant = () => setIsOpen(false)
+
+  const addTimelineEvent = (label, icon = '⚡') => {
+    const now = new Date()
+    const timeStr = `${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+    setTimelineEvents((prev) => [{ time: timeStr, label, icon }, ...prev.slice(0, 7)])
+  }
 
   return (
     <AssistantContext.Provider
@@ -44,6 +62,13 @@ export function AssistantProvider({ children }) {
         setThinkingStep,
         sessionSummary,
         setSessionSummary,
+        timelineEvents,
+        setTimelineEvents,
+        addTimelineEvent,
+        smartFollowups,
+        setSmartFollowups,
+        currentWebsiteState,
+        setCurrentWebsiteState,
       }}
     >
       {children}

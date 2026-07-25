@@ -6,6 +6,9 @@ import LanguageSelection from './LanguageSelection'
 import CallControls from './CallControls'
 import SessionSummaryModal from './SessionSummaryModal'
 import ScreenHighlightOverlay from './ScreenHighlightOverlay'
+import MultimodalTimeline from './MultimodalTimeline'
+import SmartFollowups from './SmartFollowups'
+import EducationModePreset from './EducationModePreset'
 import LogoIcon from '../../components/common/LogoIcon'
 import { useVoiceConversation } from '../../hooks/useVoiceConversation'
 import { useScreenShare } from '../../hooks/useScreenShare'
@@ -39,6 +42,10 @@ export default function VirtualAssistantModal() {
     setThinkingStep,
     sessionSummary,
     setSessionSummary,
+    timelineEvents,
+    addTimelineEvent,
+    smartFollowups,
+    currentWebsiteState,
   } = useAssistant()
 
   const [showLanguageSelect, setShowLanguageSelect] = useState(true)
@@ -72,6 +79,7 @@ export default function VirtualAssistantModal() {
   const handleSelectLanguage = async (code) => {
     setAssistantLanguage(code)
     setShowLanguageSelect(false)
+    addTimelineEvent('Language Selected: 22 Indian Languages Active', '🌐')
 
     try {
       const res = await startAssistantSessionAPI(code)
@@ -99,13 +107,17 @@ export default function VirtualAssistantModal() {
     setMessages((prev) => [...prev, userMsg])
     setAvatarState('thinking')
     setThinkingStep('🧠 Consulting Government & Specialist Agents...')
+    addTimelineEvent(`User Query: "${q.slice(0, 24)}..."`, '💬')
 
     try {
       const res = await sendAssistantMessageAPI(sessionId, q, assistantLanguage)
       const aiMsg = { id: Date.now() + 1, type: 'assistant', text: res.response }
       setMessages((prev) => [...prev, aiMsg])
 
-      if (res.agents) setActiveAgents(res.agents)
+      if (res.agents) {
+        setActiveAgents(res.agents)
+        addTimelineEvent(`Agents Active: ${res.agents.join(', ')}`, '🤝')
+      }
       if (res.progress_pct) {
         setCurrentGoal((prev) => ({ ...prev, progress: res.progress_pct }))
       }
@@ -119,6 +131,7 @@ export default function VirtualAssistantModal() {
   }
 
   const handleVoiceInputTrigger = () => {
+    addTimelineEvent('Microphone Input Active', '🎤')
     startListening((recognizedText) => {
       handleSendText(recognizedText)
     })
@@ -128,10 +141,12 @@ export default function VirtualAssistantModal() {
     if (isSharing) {
       stopScreenShare()
       setScreenHighlight(null)
+      addTimelineEvent('Screen Share Stopped', '🖥')
     } else {
       startScreenShare(async (blob) => {
         setAvatarState('looking')
         setThinkingStep('👀 Looking at your screen webpage...')
+        addTimelineEvent('Screen Frame Captured & Analyzing...', '🔍')
         const visionData = await uploadScreenFrameAPI(sessionId, blob, '', assistantLanguage)
 
         if (visionData.vision) {
@@ -141,6 +156,7 @@ export default function VirtualAssistantModal() {
             setCurrentGoal({ title: v.goal_title, progress: v.progress_pct || 60, nextStep: 'Click New Farmer Registration' })
           }
           setScreenHighlight('New Farmer Registration')
+          addTimelineEvent('Spatial Highlight Overlay Active', '🔵')
           const guidanceMsg = {
             id: Date.now(),
             type: 'assistant',
@@ -156,9 +172,11 @@ export default function VirtualAssistantModal() {
   const handleCameraToggleTrigger = async () => {
     if (isCameraActive) {
       stopCamera()
+      addTimelineEvent('Camera Feed Stopped', '📷')
     } else {
       setAvatarState('looking')
       setThinkingStep('📷 Connecting citizen video feed...')
+      addTimelineEvent('Citizen Camera Feed Connected', '📷')
       const stream = await startCamera(videoRef.current)
 
       if (stream) {
@@ -167,6 +185,7 @@ export default function VirtualAssistantModal() {
           const blob = await captureFrameBlob()
           if (blob) {
             setThinkingStep('👀 Janvi reading physical Aadhaar / Income certificate...')
+            addTimelineEvent('Document Understanding Active', '📄')
             const visionData = await uploadScreenFrameAPI(sessionId, blob, 'Camera Document Analysis', assistantLanguage)
             if (visionData.vision) {
               const v = visionData.vision
@@ -192,7 +211,6 @@ export default function VirtualAssistantModal() {
     }
   }
 
-  // All Available 7 Specialists for Multi-Agent Radar (Active & Standby)
   const ALL_AGENTS_RADAR = [
     { name: 'Vision Agent', desc: 'Detecting UI & Spatial Elements' },
     { name: 'Government Agent', desc: 'Searching Scheme Database' },
@@ -267,7 +285,7 @@ export default function VirtualAssistantModal() {
       </div>
 
       {/* Main Container Body */}
-      <div style={{ flex: 1, display: 'flex', position: 'relative', overflow: 'hidden', padding: 20, gap: 20 }}>
+      <div style={{ flex: 1, display: 'flex', position: 'relative', overflow: 'hidden', padding: 18, gap: 18 }}>
         {showLanguageSelect ? (
           <div style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             <LanguageSelection onSelectLanguage={handleSelectLanguage} />
@@ -280,7 +298,7 @@ export default function VirtualAssistantModal() {
                 width: 310,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 14,
+                gap: 12,
                 background: 'rgba(7,26,53,0.6)',
                 border: '1px solid rgba(56,189,248,0.15)',
                 borderRadius: 20,
@@ -298,14 +316,14 @@ export default function VirtualAssistantModal() {
                   background: 'rgba(11,36,71,0.85)',
                   border: `1px solid ${isCameraActive ? '#10B981' : 'rgba(56,189,248,0.2)'}`,
                   borderRadius: 16,
-                  padding: 12,
+                  padding: 10,
                   position: 'relative',
                   overflow: 'hidden',
                 }}
               >
                 <div style={{ fontSize: 11, fontWeight: 700, color: isCameraActive ? '#34D399' : 'rgba(240,246,255,0.6)', marginBottom: 6, display: 'flex', alignItems: 'center', gap: 6 }}>
                   <span style={{ width: 6, height: 6, borderRadius: '50%', background: isCameraActive ? '#10B981' : 'rgba(255,255,255,0.3)', display: 'inline-block' }} />
-                  {isCameraActive ? '📷 Citizen Video Feed (Janvi Seeing You)' : '📷 Camera Feed'}
+                  {isCameraActive ? '📷 Citizen Feed (Janvi Seeing You)' : '📷 Camera Feed'}
                 </div>
 
                 <video
@@ -314,7 +332,7 @@ export default function VirtualAssistantModal() {
                   playsInline
                   style={{
                     width: '100%',
-                    height: isCameraActive ? 130 : 0,
+                    height: isCameraActive ? 120 : 0,
                     borderRadius: 12,
                     objectFit: 'cover',
                     background: '#000',
@@ -349,21 +367,21 @@ export default function VirtualAssistantModal() {
                   background: 'rgba(11,36,71,0.7)',
                   border: '1px solid rgba(56,189,248,0.2)',
                   borderRadius: 16,
-                  padding: 14,
+                  padding: 12,
                 }}
               >
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
                   Currently Viewing
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6, fontSize: 12, color: 'rgba(240,246,255,0.85)' }}>
-                  <div>🏛 <strong>Portal:</strong> PM-KISAN Portal</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11.5, color: 'rgba(240,246,255,0.85)' }}>
+                  <div>🏛 <strong>Portal:</strong> {currentWebsiteState}</div>
                   <div>📍 <strong>Location:</strong> Maharashtra, India</div>
                   <div>🌾 <strong>Domain:</strong> Agriculture Assistance</div>
                 </div>
               </div>
             </div>
 
-            {/* CENTER COLUMN: Live Assistant Speech Stage & Sequence Log & Overlay */}
+            {/* CENTER COLUMN: Live Assistant Speech Stage & Sequence Log & Presets */}
             <div
               style={{
                 flex: 1,
@@ -372,7 +390,7 @@ export default function VirtualAssistantModal() {
                 background: 'rgba(7,26,53,0.4)',
                 border: '1px solid rgba(56,189,248,0.15)',
                 borderRadius: 20,
-                padding: 20,
+                padding: 18,
                 backdropFilter: 'blur(15px)',
                 position: 'relative',
               }}
@@ -386,17 +404,17 @@ export default function VirtualAssistantModal() {
                   initial={{ opacity: 0, y: -8 }}
                   animate={{ opacity: 1, y: 0 }}
                   style={{
-                    padding: '10px 18px',
+                    padding: '8px 16px',
                     background: 'rgba(37,99,235,0.2)',
                     border: '1px solid rgba(56,189,248,0.35)',
-                    borderRadius: 14,
-                    fontSize: 13,
+                    borderRadius: 12,
+                    fontSize: 12.5,
                     color: '#60A5FA',
                     fontWeight: 600,
-                    marginBottom: 14,
+                    marginBottom: 10,
                     display: 'flex',
                     alignItems: 'center',
-                    gap: 10,
+                    gap: 8,
                   }}
                 >
                   <span className="pulse-dot" style={{ width: 8, height: 8, borderRadius: '50%', background: '#38BDF8' }} />
@@ -408,43 +426,49 @@ export default function VirtualAssistantModal() {
               {lastAssistantMessage && (
                 <div
                   style={{
-                    padding: '16px 20px',
+                    padding: '14px 18px',
                     background: 'linear-gradient(135deg, rgba(11,36,71,0.9), rgba(7,26,53,0.95))',
                     border: '1px solid rgba(56,189,248,0.3)',
-                    borderRadius: 18,
-                    marginBottom: 14,
-                    boxShadow: '0 0 30px rgba(4,13,26,0.6)',
+                    borderRadius: 16,
+                    marginBottom: 12,
+                    boxShadow: '0 0 25px rgba(4,13,26,0.6)',
                   }}
                 >
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 8 }}>
-                    <div style={{ fontSize: 14, fontWeight: 800, color: '#38BDF8' }}>👩 Janvi Spoken Guidance</div>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+                    <div style={{ fontSize: 13.5, fontWeight: 800, color: '#38BDF8' }}>👩 Janvi Spoken Guidance</div>
                     {avatarState === 'speaking' && (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#10B981', fontSize: 12, fontWeight: 700 }}>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 4, color: '#10B981', fontSize: 11.5, fontWeight: 700 }}>
                         <span>🔊 Speaking...</span>
                       </div>
                     )}
                   </div>
-                  <p style={{ fontSize: 15, lineHeight: 1.6, color: '#F0F6FF', fontWeight: 500, margin: 0 }}>
+                  <p style={{ fontSize: 14.5, lineHeight: 1.55, color: '#F0F6FF', fontWeight: 500, margin: 0 }}>
                     "{lastAssistantMessage.text}"
                   </p>
                 </div>
               )}
 
+              {/* Phase 12 Smart Follow-ups Suggestions */}
+              <SmartFollowups suggestions={smartFollowups} onSelect={handleSendText} />
+
+              {/* Phase 6 Education Mode Presets */}
+              <EducationModePreset onSelect={handleSendText} />
+
               {/* Conversation Log Feed */}
-              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 10, paddingRight: 6 }}>
+              <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10, paddingRight: 6 }}>
                 {messages.map((m) => (
                   <div
                     key={m.id}
                     style={{
                       alignSelf: m.type === 'user' ? 'flex-end' : 'flex-start',
                       maxWidth: '82%',
-                      padding: '10px 16px',
-                      borderRadius: m.type === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                      background: m.type === 'user' ? 'linear-gradient(135deg, #2563EB, #1D4ED8)' : 'rgba(11,36,71,0.7)',
+                      padding: '8px 14px',
+                      borderRadius: m.type === 'user' ? '14px 14px 4px 14px' : '14px 14px 14px 4px',
+                      background: m.type === 'user' ? 'linear-gradient(135deg, #2563EB, #1D4ED8)' : 'rgba(11,36,71,0.65)',
                       border: m.type === 'user' ? 'none' : '1px solid rgba(56,189,248,0.18)',
                       color: '#F0F6FF',
-                      fontSize: 13.5,
-                      lineHeight: 1.55,
+                      fontSize: 13,
+                      lineHeight: 1.5,
                     }}
                   >
                     {m.text}
@@ -453,7 +477,7 @@ export default function VirtualAssistantModal() {
               </div>
 
               {/* Voice / Text Prompt Bar */}
-              <div style={{ display: 'flex', gap: 8, marginTop: 14 }}>
+              <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
                 <input
                   type="text"
                   value={textInput}
@@ -462,8 +486,8 @@ export default function VirtualAssistantModal() {
                   placeholder="Speak to Janvi or type your question..."
                   style={{
                     flex: 1,
-                    padding: '12px 18px',
-                    borderRadius: 14,
+                    padding: '10px 16px',
+                    borderRadius: 12,
                     background: 'rgba(11,36,71,0.85)',
                     border: '1px solid rgba(56,189,248,0.25)',
                     color: '#fff',
@@ -474,8 +498,8 @@ export default function VirtualAssistantModal() {
                 <button
                   onClick={() => handleSendText(textInput)}
                   style={{
-                    padding: '12px 24px',
-                    borderRadius: 14,
+                    padding: '10px 20px',
+                    borderRadius: 12,
                     background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
                     border: 'none',
                     color: 'white',
@@ -489,27 +513,27 @@ export default function VirtualAssistantModal() {
               </div>
             </div>
 
-            {/* RIGHT COLUMN: Active Multi-Agent Radar (Active & Standby) & Goal Tracker */}
+            {/* RIGHT COLUMN: Active Multi-Agent Radar & Multimodal Timeline */}
             <div
               style={{
                 width: 280,
                 display: 'flex',
                 flexDirection: 'column',
-                gap: 16,
+                gap: 14,
                 background: 'rgba(7,26,53,0.6)',
                 border: '1px solid rgba(56,189,248,0.15)',
                 borderRadius: 20,
-                padding: 18,
+                padding: 16,
                 backdropFilter: 'blur(15px)',
                 overflowY: 'auto',
               }}
             >
               {/* Task Goal Progress Bar */}
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
                   Task Goal Progress
                 </div>
-                <div style={{ fontSize: 14, fontWeight: 700, color: '#F0F6FF', marginBottom: 8 }}>{currentGoal.title}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#F0F6FF', marginBottom: 6 }}>{currentGoal.title}</div>
                 <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden', marginBottom: 6 }}>
                   <motion.div animate={{ width: `${currentGoal.progress}%` }} style={{ height: '100%', background: '#38BDF8' }} />
                 </div>
@@ -519,9 +543,12 @@ export default function VirtualAssistantModal() {
                 </div>
               </div>
 
+              {/* Phase 11 Multimodal Timeline Component */}
+              <MultimodalTimeline events={timelineEvents} />
+
               {/* Multi-Agent Radar (Active vs Standby States) */}
               <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 8 }}>
+                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
                   Active Agent Radar
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
@@ -531,22 +558,22 @@ export default function VirtualAssistantModal() {
                       <div
                         key={ag.name}
                         style={{
-                          padding: '8px 10px',
+                          padding: '6px 10px',
                           background: isActive ? 'rgba(16,185,129,0.12)' : 'rgba(11,36,71,0.4)',
                           border: `1px solid ${isActive ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.06)'}`,
-                          borderRadius: 10,
-                          fontSize: 11.5,
+                          borderRadius: 8,
+                          fontSize: 11,
                         }}
                       >
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                           <span style={{ fontWeight: 700, color: isActive ? '#34D399' : 'rgba(240,246,255,0.4)' }}>
                             {isActive ? '🟢' : '⚪'} {ag.name}
                           </span>
-                          <span style={{ fontSize: 10, color: isActive ? '#34D399' : 'rgba(240,246,255,0.3)', fontWeight: 600 }}>
+                          <span style={{ fontSize: 9.5, color: isActive ? '#34D399' : 'rgba(240,246,255,0.3)', fontWeight: 600 }}>
                             {isActive ? 'Active' : 'Standby'}
                           </span>
                         </div>
-                        <div style={{ fontSize: 10.5, color: 'rgba(240,246,255,0.5)', marginTop: 2 }}>{ag.desc}</div>
+                        <div style={{ fontSize: 10, color: 'rgba(240,246,255,0.5)', marginTop: 2 }}>{ag.desc}</div>
                       </div>
                     )
                   })}
