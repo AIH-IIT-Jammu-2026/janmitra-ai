@@ -1,84 +1,18 @@
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useLocation } from 'react-router-dom'
-import Sidebar from '../components/Sidebar'
+import Sidebar from '../components/layout/Sidebar'
 import NeuralBackground from '../components/NeuralBackground'
 import { UserMessage, AIMessage, TypingAnimation } from '../components/ChatMessages'
-import { MOCK_RESPONSES, SUGGESTED_PROMPTS, detectIntent } from '../data/mockResponses'
+import LoadingOverlay from '../components/chat/LoadingOverlay'
+import { sendChatMessage } from '../clients/chatClient'
 
-const VOICE_QUERIES = [
-  'I am a farmer from Maharashtra. Which government schemes am I eligible for?',
-  'I have fever and headache. What should I do?',
-  'Please review my resume and suggest improvements.',
-  'Show me current mandi prices in Maharashtra.',
+const SUGGESTED_PROMPTS = [
+  { label: '🌾 PM-KISAN & Farmer Schemes', query: 'I am a farmer from Maharashtra. Which government schemes am I eligible for?' },
+  { label: '🩺 Ayushman Bharat & Free Medicine', query: 'What is Ayushman Bharat health insurance and Jan Aushadhi generic medicines?' },
+  { label: '🎓 NSP Scholarships & Education', query: 'Show me National Scholarship Portal schemes for SC/ST and college students' },
+  { label: '🏠 PMAY Housing & Loans', query: 'How to apply for PMAY housing subsidy and PM SVANidhi street vendor loans?' },
 ]
-
-function MultiAgentAnimation({ show, agents }) {
-  if (!show) return null
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      animate={{ opacity: 1, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.9 }}
-      style={{
-        position: 'fixed', inset: 0,
-        background: 'rgba(4,13,26,0.85)',
-        backdropFilter: 'blur(8px)',
-        zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-      }}
-    >
-      <div style={{ textAlign: 'center', padding: 40 }}>
-        <motion.div
-          animate={{ scale: [1, 1.05, 1], opacity: [0.8, 1, 0.8] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          style={{ fontSize: 48, marginBottom: 24 }}
-        >🤖</motion.div>
-        <h3 style={{ color: '#60A5FA', fontSize: 18, fontWeight: 600, marginBottom: 20, fontFamily: 'Space Grotesk, sans-serif' }}>
-          Multi-Agent Orchestration Active
-        </h3>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-          <AgentFlowItem label="Intent Router" active={true} delay={0} />
-          <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 0.8, repeat: 3 }}
-            style={{ width: 2, height: 20, background: '#38BDF8' }} />
-          <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', justifyContent: 'center' }}>
-            {agents.map((a, i) => <AgentFlowItem key={a} label={a} active={true} delay={0.3 + i * 0.15} />)}
-          </div>
-          <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 0.8, repeat: 3, delay: 0.5 }}
-            style={{ width: 2, height: 20, background: '#38BDF8' }} />
-          <AgentFlowItem label="RAG Knowledge Base" active={true} delay={0.8} icon="🗄️" />
-          <motion.div animate={{ opacity: [0.3, 1, 0.3] }} transition={{ duration: 0.8, repeat: 3, delay: 1 }}
-            style={{ width: 2, height: 20, background: '#38BDF8' }} />
-          <AgentFlowItem label="Generating Response..." active={true} delay={1} icon="✨" />
-        </div>
-      </div>
-    </motion.div>
-  )
-}
-
-function AgentFlowItem({ label, active, delay, icon = '🤖' }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.8 }}
-      animate={{ opacity: 1, scale: 1 }}
-      transition={{ delay }}
-      style={{
-        padding: '8px 18px',
-        background: 'rgba(37,99,235,0.2)',
-        border: '1px solid rgba(56,189,248,0.3)',
-        borderRadius: 20, color: '#60A5FA',
-        fontSize: 13, fontWeight: 500,
-        display: 'flex', alignItems: 'center', gap: 6,
-        boxShadow: '0 0 12px rgba(37,99,235,0.3)',
-      }}
-    >
-      <motion.span animate={{ opacity: [0.5, 1, 0.5] }} transition={{ duration: 1.5, repeat: Infinity }}>
-        {icon}
-      </motion.span>
-      {label}
-    </motion.div>
-  )
-}
 
 export default function ChatPage() {
   const location = useLocation()
@@ -86,36 +20,30 @@ export default function ChatPage() {
     {
       id: 0,
       type: 'ai',
-      agents: [],
-      badges: [],
-      content: `# नमस्ते! I'm JanMitra AI 🇮🇳
+      agents: ['Router Agent'],
+      actionPlan: [
+        { title: 'Explore Schemes', description: 'Ask about PM-KISAN, PMAY, or Ayushman Bharat' },
+        { title: 'Scholarship Guidance', description: 'Find National Scholarship Portal eligibility' },
+      ],
+      sources: [
+        { name: 'MyScheme Portal', url: 'https://myscheme.gov.in' }
+      ],
+      content: `# Namaste! I am JanMitra AI 🇮🇳
 
-I'm your intelligent citizen assistant, here to help you navigate government services, healthcare, education, employment, agriculture, legal matters, and emergency support.
+I am your intelligent multi-agent citizen assistant. Ask me anything regarding **Government Schemes, Healthcare, Education, Employment, Agriculture, or Legal Guidance**.
 
-**What can I help you with today?**
-
-- 🏛️ Find government schemes you're eligible for
-- 🩺 Get health guidance and hospital information
-- 🎓 Discover scholarships and career paths
-- 💼 Resume review and job matching
-- 🌾 Crop prices, farming schemes, and agricultural advice
-- ⚖️ Legal rights and consumer protection
-- 🚨 Emergency assistance and SOS
-
-*I understand English, Hindi, Marathi, Tamil, Telugu, and 18 more languages.*`,
+*Powered by LangGraph multi-agent orchestration, RAG vector retrieval, and Gemini.*`,
     }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [showOrchestratorAnim, setShowOrchestratorAnim] = useState(false)
-  const [activeAgents, setActiveAgents] = useState([])
   const [listening, setListening] = useState(false)
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
     const initialQuery = location.state?.initialQuery
     if (initialQuery) {
-      setTimeout(() => sendMessage(initialQuery), 300)
+      setTimeout(() => handleSend(initialQuery), 300)
     }
   }, [])
 
@@ -123,83 +51,107 @@ I'm your intelligent citizen assistant, here to help you navigate government ser
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages, loading])
 
-  async function sendMessage(text) {
-    if (!text.trim() || loading) return
+  async function handleSend(text) {
+    const queryText = text || input
+    if (!queryText || !queryText.trim() || loading) return
+
     setInput('')
-    const userMsg = { id: Date.now(), type: 'user', content: text }
-    setMessages(prev => [...prev, userMsg])
+    const userMsg = { id: Date.now(), type: 'user', content: queryText }
+    setMessages((prev) => [...prev, userMsg])
     setLoading(true)
 
-    // Detect intent
-    const intent = detectIntent(text)
-    const response = MOCK_RESPONSES[intent]
-    const agents = response.agents
+    try {
+      const data = await sendChatMessage(queryText)
 
-    // Show orchestrator animation
-    setActiveAgents(agents)
-    setShowOrchestratorAnim(true)
-    await new Promise(r => setTimeout(r, 2000))
-    setShowOrchestratorAnim(false)
-    setLoading(false)
-
-    const aiMsg = {
-      id: Date.now() + 1,
-      type: 'ai',
-      agents: response.agents,
-      badges: response.badges,
-      content: response.content,
+      const aiMsg = {
+        id: Date.now() + 1,
+        type: 'ai',
+        agents: data.agents || [],
+        actionPlan: data.action_plan || [],
+        sources: data.sources || [],
+        content: data.response || 'No response text generated.',
+      }
+      setMessages((prev) => [...prev, aiMsg])
+    } catch (err) {
+      console.warn('Backend API connection warning:', err)
+      const errorMsg = {
+        id: Date.now() + 1,
+        type: 'ai',
+        agents: ['System Warning'],
+        actionPlan: [
+          { title: 'Start FastAPI Backend', description: 'Run: python -m uvicorn backend.main:app --reload', priority: 'High' }
+        ],
+        sources: [{ name: 'JanMitra AI API Contract', url: 'http://localhost:8000/docs' }],
+        content: `⚠️ **Unable to connect to JanMitra AI Backend**\n\nCould not reach \`http://localhost:8000/api/chat\`.\n\n*Please ensure your FastAPI backend server is running on port 8000.*`,
+      }
+      setMessages((prev) => [...prev, errorMsg])
+    } finally {
+      setLoading(false)
     }
-    setMessages(prev => [...prev, aiMsg])
   }
 
-  const handleVoice = async () => {
+  const handleVoiceInput = () => {
+    if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+      alert('Speech recognition is not supported in your browser. Please use Chrome or Edge.')
+      return
+    }
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
+    const recognition = new SpeechRecognition()
+    recognition.lang = 'en-IN'
+    recognition.interimResults = false
+
     setListening(true)
-    await new Promise(r => setTimeout(r, 2000))
-    setListening(false)
-    const query = VOICE_QUERIES[Math.floor(Math.random() * VOICE_QUERIES.length)]
-    setInput(query)
+    recognition.start()
+
+    recognition.onresult = (event) => {
+      const transcript = event.results[0][0].transcript
+      setInput(transcript)
+      setListening(false)
+    }
+
+    recognition.onerror = () => {
+      setListening(false)
+    }
+
+    recognition.onend = () => {
+      setListening(false)
+    }
   }
 
   return (
-    <div className="app-layout">
+    <div className="app-layout" style={{ display: 'flex', minHeight: '100vh', background: '#040d1a' }}>
       <Sidebar />
-      <div className="main-content" style={{ display: 'flex', flexDirection: 'column', height: '100vh', position: 'relative' }}>
+      <div className="main-content" style={{ flex: 1, display: 'flex', flexDirection: 'column', height: '100vh', position: 'relative', overflow: 'hidden' }}>
         <NeuralBackground />
 
-        {/* Top bar */}
+        {/* Top Header */}
         <div style={{
           position: 'relative', zIndex: 10,
           padding: '14px 24px',
-          background: 'rgba(4,13,26,0.7)',
+          background: 'rgba(4,13,26,0.75)',
           backdropFilter: 'blur(20px)',
-          borderBottom: '1px solid rgba(56,189,248,0.08)',
+          borderBottom: '1px solid rgba(56,189,248,0.1)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{
-              width: 30, height: 30, borderRadius: '50%',
+              width: 32, height: 32, borderRadius: '50%',
               background: 'linear-gradient(135deg, #2563EB, #38BDF8)',
               display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
               boxShadow: '0 0 12px rgba(37,99,235,0.5)',
             }}>🤖</div>
             <div>
-              <div style={{ fontSize: 14, fontWeight: 600, color: '#F0F6FF' }}>JanMitra AI Assistant</div>
-              <div style={{ fontSize: 11, color: 'rgba(240,246,255,0.4)', display: 'flex', alignItems: 'center', gap: 4 }}>
-                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block' }} />
-                Online · 7 Agents Active · 22 Languages
+              <div style={{ fontSize: 14, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif' }}>JanMitra AI Assistant</div>
+              <div style={{ fontSize: 11, color: 'rgba(240,246,255,0.45)', display: 'flex', alignItems: 'center', gap: 6 }}>
+                <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block', boxShadow: '0 0 6px #34D399' }} />
+                Online · LangGraph Multi-Agent RAG Core Active
               </div>
             </div>
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
-            {['🔄', '📋', '⚙️'].map(icon => (
-              <button key={icon} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 8, color: 'rgba(240,246,255,0.5)', cursor: 'pointer', width: 32, height: 32, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14 }}>
-                {icon}
-              </button>
-            ))}
-          </div>
         </div>
 
-        {/* Messages */}
+        {/* Chat Messages List */}
         <div style={{ flex: 1, overflowY: 'auto', position: 'relative', zIndex: 2, paddingTop: 16, paddingBottom: 8 }}>
           <AnimatePresence initial={false}>
             {messages.map(msg => msg.type === 'user'
@@ -217,13 +169,13 @@ I'm your intelligent citizen assistant, here to help you navigate government ser
             {SUGGESTED_PROMPTS.map(p => (
               <motion.button
                 key={p.label}
-                whileHover={{ scale: 1.04, borderColor: 'rgba(56,189,248,0.4)' }}
+                whileHover={{ scale: 1.03, borderColor: 'rgba(56,189,248,0.4)' }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => sendMessage(p.query)}
+                onClick={() => handleSend(p.query)}
                 style={{
                   padding: '7px 14px',
-                  background: 'rgba(37,99,235,0.08)',
-                  border: '1px solid rgba(37,99,235,0.2)',
+                  background: 'rgba(37,99,235,0.1)',
+                  border: '1px solid rgba(37,99,235,0.25)',
                   borderRadius: 20, color: '#60A5FA',
                   fontSize: 12, cursor: 'pointer',
                   whiteSpace: 'nowrap', fontFamily: 'Inter, sans-serif',
@@ -236,36 +188,33 @@ I'm your intelligent citizen assistant, here to help you navigate government ser
           </div>
         )}
 
-        {/* Input */}
+        {/* Input Bar */}
         <div style={{
           position: 'relative', zIndex: 10,
           padding: '12px 20px 20px',
-          background: 'rgba(4,13,26,0.7)',
+          background: 'rgba(4,13,26,0.8)',
           backdropFilter: 'blur(20px)',
-          borderTop: '1px solid rgba(56,189,248,0.08)',
+          borderTop: '1px solid rgba(56,189,248,0.1)',
         }}>
           <div style={{
             display: 'flex', gap: 10, alignItems: 'flex-end',
-            background: 'rgba(11,36,71,0.5)',
-            border: `1px solid ${input ? 'rgba(56,189,248,0.35)' : 'rgba(56,189,248,0.12)'}`,
+            background: 'rgba(11,36,71,0.6)',
+            border: `1px solid ${input ? 'rgba(56,189,248,0.4)' : 'rgba(56,189,248,0.15)'}`,
             borderRadius: 16,
             padding: '4px 6px 4px 16px',
-            boxShadow: input ? '0 0 20px rgba(56,189,248,0.08)' : 'none',
+            boxShadow: input ? '0 0 20px rgba(56,189,248,0.12)' : 'none',
             transition: 'all 0.3s',
           }}>
-            {/* File upload */}
-            <button style={{ background: 'none', border: 'none', color: 'rgba(240,246,255,0.3)', cursor: 'pointer', padding: '8px 4px', fontSize: 18, display: 'flex', alignItems: 'center' }} title="Upload file">📎</button>
-
             <textarea
               value={input}
               onChange={e => setInput(e.target.value)}
               onKeyDown={e => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault()
-                  sendMessage(input)
+                  handleSend(input)
                 }
               }}
-              placeholder="Ask me about government schemes, health, education, jobs, farming, legal help..."
+              placeholder="Ask about government schemes, health, scholarships, farming, loans..."
               rows={1}
               style={{
                 flex: 1, background: 'none', border: 'none', outline: 'none',
@@ -274,36 +223,33 @@ I'm your intelligent citizen assistant, here to help you navigate government ser
                 fontFamily: 'Inter, sans-serif',
                 maxHeight: 120, overflowY: 'auto',
               }}
-              onInput={e => {
-                e.target.style.height = 'auto'
-                e.target.style.height = Math.min(e.target.scrollHeight, 120) + 'px'
-              }}
             />
 
-            {/* Voice */}
+            {/* Voice Input */}
             <motion.button
               whileHover={{ scale: 1.1 }}
               whileTap={{ scale: 0.9 }}
-              onClick={handleVoice}
+              onClick={handleVoiceInput}
               style={{
-                background: listening ? 'rgba(239,68,68,0.2)' : 'rgba(37,99,235,0.12)',
-                border: `1px solid ${listening ? 'rgba(239,68,68,0.4)' : 'rgba(37,99,235,0.2)'}`,
+                background: listening ? 'rgba(239,68,68,0.25)' : 'rgba(37,99,235,0.12)',
+                border: `1px solid ${listening ? 'rgba(239,68,68,0.5)' : 'rgba(37,99,235,0.25)'}`,
                 borderRadius: 10, color: listening ? '#F87171' : '#60A5FA',
                 cursor: 'pointer', width: 36, height: 36,
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
                 flexShrink: 0, margin: '4px 2px',
               }}
+              title="Speak query"
             >
               {listening ? (
                 <motion.span animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 0.5, repeat: Infinity }}>🎙️</motion.span>
               ) : '🎤'}
             </motion.button>
 
-            {/* Send */}
+            {/* Send Button */}
             <motion.button
               whileHover={{ scale: 1.08 }}
               whileTap={{ scale: 0.92 }}
-              onClick={() => sendMessage(input)}
+              onClick={() => handleSend(input)}
               disabled={!input.trim() || loading}
               style={{
                 background: input.trim() ? 'linear-gradient(135deg, #2563EB, #1D4ED8)' : 'rgba(37,99,235,0.1)',
@@ -319,15 +265,13 @@ I'm your intelligent citizen assistant, here to help you navigate government ser
               }}
             >→</motion.button>
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(240,246,255,0.25)', textAlign: 'center', marginTop: 8 }}>
-            JanMitra AI provides information guidance only. Always verify with official government portals.
+          <p style={{ fontSize: 11, color: 'rgba(240,246,255,0.3)', textAlign: 'center', marginTop: 8 }}>
+            JanMitra AI matches queries using real RAG vector retrieval & LangGraph multi-agent orchestration.
           </p>
         </div>
 
-        {/* Orchestrator Animation Overlay */}
-        <AnimatePresence>
-          {showOrchestratorAnim && <MultiAgentAnimation show agents={activeAgents} />}
-        </AnimatePresence>
+        {/* Stage Loading Overlay */}
+        <LoadingOverlay show={loading} />
       </div>
     </div>
   )
