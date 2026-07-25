@@ -1,6 +1,7 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import ThreeDJanviAvatar from './ThreeDJanviAvatar'
+import DIDAgentAvatar from './DIDAgentAvatar'
 
 export default function JanviAvatar({ state = 'idle' }) {
   // State Visual Configurations
@@ -10,8 +11,8 @@ export default function JanviAvatar({ state = 'idle' }) {
       glow: 'rgba(56,189,248,0.5)',
       badgeBg: 'rgba(56,189,248,0.15)',
       badgeBorder: 'rgba(56,189,248,0.4)',
-      statusTag: '● 3D DIGITAL HUMAN',
-      text: '😊 3D Janvi Online · Ready',
+      statusTag: '● D-ID DIGITAL HUMAN',
+      text: '😊 Live D-ID Janvi Avatar · Connected',
     },
     listening: {
       color: '#2563EB',
@@ -43,7 +44,7 @@ export default function JanviAvatar({ state = 'idle' }) {
       badgeBg: 'rgba(16,185,129,0.25)',
       badgeBorder: 'rgba(16,185,129,0.6)',
       statusTag: '🔊 Speaking...',
-      text: '🗣 Janvi Responding',
+      text: '🗣 Live D-ID Digital Human Responding',
     },
   }
 
@@ -70,7 +71,7 @@ export default function JanviAvatar({ state = 'idle' }) {
         }}
       />
 
-      {/* Main 3D Card Container (Three.js WebGL 3D Digital Human Avatar) */}
+      {/* Main 3D Card Container (D-ID Real-Time Interactive Streaming Avatar + WebGL 3D Engine) */}
       <motion.div
         animate={
           state === 'speaking'
@@ -139,9 +140,9 @@ export default function JanviAvatar({ state = 'idle' }) {
           />
         )}
 
-        {/* Three.js WebGL 3D Digital Human Avatar Canvas */}
+        {/* D-ID Real-Time Interactive Streaming Avatar Component */}
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <ThreeDJanviAvatar state={state} />
+          <DIDAgentAvatar state={state} />
         </div>
 
         {/* Audio Equalizer Synced when Janvi is Speaking */}
