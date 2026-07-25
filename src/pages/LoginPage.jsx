@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { useGoogleLogin } from '@react-oauth/google'
 import NeuralBackground from '../components/NeuralBackground'
 
 export default function LoginPage() {
@@ -11,6 +12,19 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const navigate = useNavigate()
+
+  // Google Login Hook from @react-oauth/google
+  const googleLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      console.log('Google Sign-In Success:', tokenResponse)
+      navigate('/chat')
+    },
+    onError: (err) => {
+      console.warn('Google Sign-In fallback active:', err)
+      // Fallback for demo mode
+      navigate('/chat')
+    },
+  })
 
   // Password validation rules
   const hasUppercase = /[A-Z]/.test(password)
@@ -36,14 +50,16 @@ export default function LoginPage() {
     }
 
     setLoading(true)
-    await new Promise((r) => setTimeout(r, 1000))
+    await new Promise((r) => setTimeout(r, 800))
     navigate('/chat')
   }
 
-  const handleGoogle = async () => {
-    setLoading(true)
-    await new Promise((r) => setTimeout(r, 800))
-    navigate('/chat')
+  const handleGoogleClick = () => {
+    try {
+      googleLogin()
+    } catch {
+      navigate('/chat')
+    }
   }
 
   return (
@@ -146,7 +162,7 @@ export default function LoginPage() {
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
-            onClick={handleGoogle}
+            onClick={handleGoogleClick}
             type="button"
             style={{
               width: '100%',
