@@ -107,7 +107,7 @@ function Navbar() {
           FAQ
         </a>
         <Link
-          to="/chat"
+          to="/signup"
           style={{
             padding: '10px 22px',
             background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
@@ -119,7 +119,7 @@ function Navbar() {
             boxShadow: '0 0 16px rgba(37,99,235,0.4)',
           }}
         >
-          Try Demo
+          Get Started
         </Link>
       </div>
     </motion.nav>
@@ -195,7 +195,7 @@ export default function LandingPage() {
 
             <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} style={{ display: 'flex', gap: 16, justifyContent: 'center', marginBottom: 48 }}>
               <Link
-                to="/chat"
+                to="/signup"
                 style={{
                   padding: '16px 36px',
                   background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
@@ -208,7 +208,7 @@ export default function LandingPage() {
                   fontFamily: 'Space Grotesk, sans-serif',
                 }}
               >
-                🚀 Try Demo Free
+                🚀 Get Started
               </Link>
               <a
                 href="#how-it-works"
@@ -232,7 +232,7 @@ export default function LandingPage() {
               {AGENTS.map((agent) => (
                 <Link
                   key={agent.name}
-                  to="/chat"
+                  to="/signup"
                   style={{
                     padding: '8px 16px',
                     background: 'rgba(11,36,71,0.6)',
@@ -359,7 +359,7 @@ export default function LandingPage() {
             {AGENTS.map((agent) => (
               <Link
                 key={agent.name}
-                to="/chat"
+                to="/signup"
                 className="glass-card"
                 style={{ padding: '20px', textDecoration: 'none', display: 'flex', gap: 14, alignItems: 'flex-start' }}
               >
