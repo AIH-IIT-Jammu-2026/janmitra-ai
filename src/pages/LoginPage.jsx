@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
+import { useGoogleLogin } from '@react-oauth/google'
 import { supabase, isSupabaseConfigured } from '../clients/supabaseClient'
 import NeuralBackground from '../components/NeuralBackground'
 
@@ -13,13 +14,26 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
+  // Google OAuth Popup Hook
+  const googlePopupLogin = useGoogleLogin({
+    onSuccess: (tokenResponse) => {
+      console.log('Google Auth Popup Success:', tokenResponse)
+      navigate('/chat')
+    },
+    onError: (err) => {
+      console.warn('Google Auth Popup notice:', err)
+      navigate('/chat')
+    },
+  })
+
   // Google Sign In Handler
   const handleGoogleClick = async () => {
     setLoading(true)
     setError('')
 
-    try {
-      if (isSupabaseConfigured) {
+    // 1. Try Supabase OAuth if configured
+    if (isSupabaseConfigured) {
+      try {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
@@ -30,12 +44,17 @@ export default function LoginPage() {
           console.warn('Supabase Auth Notice:', error.message)
           navigate('/chat')
         }
-      } else {
-        // Instant login to AI Assistant demo
-        navigate('/chat')
+        return
+      } catch (err) {
+        console.warn('Supabase OAuth error:', err)
       }
-    } catch (err) {
-      console.warn('Google login catch handler:', err)
+    }
+
+    // 2. Try Google OAuth Popup
+    try {
+      googlePopupLogin()
+    } catch {
+      // 3. Fallback direct demo access
       navigate('/chat')
     } finally {
       setLoading(false)
@@ -67,8 +86,8 @@ export default function LoginPage() {
 
     setLoading(true)
 
-    try {
-      if (isSupabaseConfigured) {
+    if (isSupabaseConfigured) {
+      try {
         if (isSignUp) {
           await supabase.auth.signUp({
             email,
@@ -81,13 +100,12 @@ export default function LoginPage() {
             password,
           })
         }
+      } catch {
+        // Fallback
       }
-      navigate('/chat')
-    } catch {
-      navigate('/chat')
-    } finally {
-      setLoading(false)
     }
+    setLoading(false)
+    navigate('/chat')
   }
 
   return (
