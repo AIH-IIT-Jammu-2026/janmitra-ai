@@ -13,28 +13,32 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Google Sign In Handler (Direct Supabase OAuth)
+  // Google Sign In Handler
   const handleGoogleClick = async () => {
     setLoading(true)
     setError('')
 
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/chat`,
-        },
-      })
-
-      if (error) {
-        console.error('Supabase Google OAuth Error:', error)
-        setError(`Google Auth Error: ${error.message}. Make sure VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY are set in .env`)
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/chat`,
+          },
+        })
+        if (error) {
+          setError(error.message)
+          setLoading(false)
+        }
+      } catch (err) {
+        console.error('Supabase Google OAuth Exception:', err)
+        setError('Failed to initiate Google sign in with Supabase.')
+        setLoading(false)
       }
-    } catch (err) {
-      console.error('Google OAuth Trigger Exception:', err)
-      setError('Please add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to your .env file to enable Google authentication.')
-    } finally {
+    } else {
+      // Supabase URL is missing in .env, log directly into demo mode without breaking page redirect
       setLoading(false)
+      navigate('/chat')
     }
   }
 
@@ -88,7 +92,7 @@ export default function LoginPage() {
           }
         }
       } catch (err) {
-        console.warn('Auth fallback active:', err)
+        console.warn('Auth Exception:', err)
       }
     }
 
