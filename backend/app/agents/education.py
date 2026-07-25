@@ -2,23 +2,14 @@ import os
 import json
 from backend.app.core.logging import logger
 from backend.app.clients.gemini import call_gemini_api
+from backend.app.rag.retriever import retrieve_relevant_schemes, retriever_instance
+
+# Expose domain knowledge base for tests/backward compatibility
+EDUCATION_DB: list[dict] = [doc for doc in retriever_instance.documents if doc.get("_domain") == "education"]
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 _AGENT_DIR   = os.path.dirname(__file__)
 _PROMPT_PATH = os.path.normpath(os.path.join(_AGENT_DIR, "..", "prompts", "education.txt"))
-_DATA_PATH   = os.path.normpath(os.path.join(_AGENT_DIR, "..", "..", "data", "education", "education.json"))
-
-# ── Load knowledge base once at startup ────────────────────────────────────────
-def _load_knowledge_base() -> list[dict]:
-    try:
-        with open(_DATA_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logger.error(f"[Education] Could not load knowledge base: {e}")
-        return []
-
-EDUCATION_DB: list[dict] = _load_knowledge_base()
-logger.info(f"[Education] Loaded {len(EDUCATION_DB)} education entries from knowledge base")
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 def _load_prompt() -> str:
@@ -30,44 +21,8 @@ def _load_prompt() -> str:
         return "You are the Education Expert Agent. Help students find scholarships and educational opportunities."
 
 def _search_education(message: str, top_k: int = 4) -> list[dict]:
-    """Keyword search over the education knowledge base (RAG placeholder)."""
-    msg_lower = message.lower()
-    msg_words = set(msg_lower.split())
-    scored: list[tuple[int, dict]] = []
-
-    for entry in EDUCATION_DB:
-        score = 0
-        keywords = entry.get("keywords", [])
-        
-        # Check phrase match & word matches in keywords
-        for kw in keywords:
-            kw_lower = kw.lower()
-            if kw_lower in msg_lower:
-                score += 3
-            else:
-                kw_words = set(kw_lower.split())
-                common = kw_words.intersection(msg_words)
-                score += len(common)
-
-        # Check name and description matches
-        name_words = set(entry.get("name", "").lower().split())
-        score += len(name_words.intersection(msg_words)) * 2
-
-        # Boost category match
-        if entry.get("category", "").lower() in msg_lower:
-            score += 2
-
-        if score > 0:
-            scored.append((score, entry))
-
-    scored.sort(key=lambda x: x[0], reverse=True)
-    results = [s for _, s in scored[:top_k]]
-
-    if not results:
-        # Default: return a mix of most popular scholarships
-        results = [e for e in EDUCATION_DB if e.get("category") == "Scholarship"][:3]
-
-    return results
+    """Semantic vector search using RAG engine over Education knowledge base."""
+    return retrieve_relevant_schemes(message, domain="education", top_k=top_k)
 
 def _build_context_text(entries: list[dict]) -> str:
     """Formats matched education entries into prompt-ready context."""
@@ -126,20 +81,20 @@ def _build_fallback_response(entries: list[dict]) -> dict:
 def run_education_agent(message: str) -> dict:
     """
     Education Expert Agent.
-    1. Searches education knowledge base for relevant scholarships/schemes.
-    2. Sends Gemini a system prompt + context + user query.
+    1. Searches education knowledge base via RAG vector engine.
+    2. Sends Gemini a system prompt + RAG context + user query.
     3. Falls back to structured knowledge base response if LLM is offline.
     """
     logger.info(f"[Education Agent] Processing: '{message}'")
 
     matched = _search_education(message)
-    logger.info(f"[Education Agent] Matched: {[e['name'] for e in matched]}")
+    logger.info(f"[Education Agent] RAG matched: {[e['name'] for e in matched]}")
 
     system_prompt = _load_prompt()
     context_text  = _build_context_text(matched)
     full_prompt   = (
         f"{system_prompt}\n\n"
-        f"--- Relevant Education Schemes from Knowledge Base ---\n{context_text}\n\n"
+        f"--- Relevant Education Schemes from RAG Retrieval ---\n{context_text}\n\n"
         f"--- Student Query ---\n\"{message}\"\n\n"
         f"Provide a helpful, personalized response using the data above:"
     )
@@ -154,7 +109,7 @@ def run_education_agent(message: str) -> dict:
                     "description": f"Required: {', '.join(e['documents'][:2])}. {e['how_to_apply']}",
                     "priority": "High"
                 }
-                for s in matched
+                for e in matched
             ]
             action_items.append({
                 "title": "Check All Scholarships on NSP",

@@ -1,26 +1,15 @@
 import os
 import json
-import re
 from backend.app.core.logging import logger
 from backend.app.clients.gemini import call_gemini_api
+from backend.app.rag.retriever import retrieve_relevant_schemes, retriever_instance
+
+# Expose domain knowledge base for tests/backward compatibility
+SCHEMES_DB: list[dict] = [doc for doc in retriever_instance.documents if doc.get("_domain") == "schemes"]
 
 # ── Paths ──────────────────────────────────────────────────────────────────────
 _AGENT_DIR   = os.path.dirname(__file__)
 _PROMPT_PATH = os.path.normpath(os.path.join(_AGENT_DIR, "..", "prompts", "schemes.txt"))
-_DATA_PATH   = os.path.normpath(os.path.join(_AGENT_DIR, "..", "..", "data",
-                                              "government_schemes", "schemes.json"))
-
-# ── Load JSON knowledge base once at startup ───────────────────────────────────
-def _load_knowledge_base() -> list[dict]:
-    try:
-        with open(_DATA_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
-    except Exception as e:
-        logger.error(f"[Schemes] Could not load knowledge base: {e}")
-        return []
-
-SCHEMES_DB: list[dict] = _load_knowledge_base()
-logger.info(f"[Schemes] Loaded {len(SCHEMES_DB)} schemes from knowledge base")
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
 def _load_prompt() -> str:
@@ -32,23 +21,8 @@ def _load_prompt() -> str:
         return "You are the Government Schemes Expert Agent. Recommend relevant welfare schemes."
 
 def _search_schemes(message: str, top_k: int = 4) -> list[dict]:
-    """Keyword search over the JSON knowledge base (RAG placeholder)."""
-    msg_lower = message.lower()
-    scored: list[tuple[int, dict]] = []
-
-    for scheme in SCHEMES_DB:
-        score = sum(1 for kw in scheme.get("keywords", []) if kw.lower() in msg_lower)
-        if score > 0:
-            scored.append((score, scheme))
-
-    scored.sort(key=lambda x: x[0], reverse=True)
-    results = [s for _, s in scored[:top_k]]
-
-    # If nothing matched, return top 3 most general schemes
-    if not results:
-        results = SCHEMES_DB[:3]
-
-    return results
+    """Semantic vector search using RAG engine over Government Schemes knowledge base."""
+    return retrieve_relevant_schemes(message, domain="schemes", top_k=top_k)
 
 def _build_context_text(schemes: list[dict]) -> str:
     """Formats matched schemes into prompt-ready context."""
@@ -67,7 +41,7 @@ def _build_context_text(schemes: list[dict]) -> str:
     return "\n\n---\n\n".join(parts)
 
 def _build_fallback_response(schemes: list[dict]) -> dict:
-    """Structured response directly from JSON knowledge base (no LLM)."""
+    """Structured response directly from knowledge base (no LLM)."""
     content_parts, action_items, sources = [], [], []
 
     for s in schemes:
@@ -103,20 +77,20 @@ def _build_fallback_response(schemes: list[dict]) -> dict:
 def run_schemes_agent(message: str) -> dict:
     """
     Government Schemes Expert Agent.
-    1. Searches JSON knowledge base for relevant schemes (RAG-ready).
-    2. Sends Gemini a system prompt + knowledge context + user query.
+    1. Searches knowledge base via RAG vector retriever.
+    2. Sends Gemini a system prompt + RAG context + user query.
     3. Falls back to structured JSON knowledge base response if LLM is offline.
     """
     logger.info(f"[Government Schemes Agent] Processing: '{message}'")
 
     matched_schemes = _search_schemes(message)
-    logger.info(f"[Government Schemes Agent] Matched schemes: {[s['name'] for s in matched_schemes]}")
+    logger.info(f"[Government Schemes Agent] RAG matched schemes: {[s['name'] for s in matched_schemes]}")
 
     system_prompt  = _load_prompt()
     context_text   = _build_context_text(matched_schemes)
     full_prompt    = (
         f"{system_prompt}\n\n"
-        f"--- Relevant Schemes from Knowledge Base ---\n{context_text}\n\n"
+        f"--- Relevant Schemes from RAG Retrieval ---\n{context_text}\n\n"
         f"--- Citizen Query ---\n\"{message}\"\n\n"
         f"Provide a helpful, personalized response using the scheme data above:"
     )
