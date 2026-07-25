@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import janviAvatarReal from '../../assets/janvi_avatar_real.png'
+import ThreeDJanviAvatar from './ThreeDJanviAvatar'
 
 export default function JanviAvatar({ state = 'idle' }) {
   // State Visual Configurations
@@ -10,8 +10,8 @@ export default function JanviAvatar({ state = 'idle' }) {
       glow: 'rgba(56,189,248,0.5)',
       badgeBg: 'rgba(56,189,248,0.15)',
       badgeBorder: 'rgba(56,189,248,0.4)',
-      statusTag: '● LIVE',
-      text: '😊 Janvi Online · Ready',
+      statusTag: '● 3D DIGITAL HUMAN',
+      text: '😊 3D Janvi Online · Ready',
     },
     listening: {
       color: '#2563EB',
@@ -70,7 +70,7 @@ export default function JanviAvatar({ state = 'idle' }) {
         }}
       />
 
-      {/* Main 3D Card Container (Real Janvi Photorealistic Portrait in JanMitra Polo) */}
+      {/* Main 3D Card Container (Three.js WebGL 3D Digital Human Avatar) */}
       <motion.div
         animate={
           state === 'speaking'
@@ -139,19 +139,9 @@ export default function JanviAvatar({ state = 'idle' }) {
           />
         )}
 
-        {/* Real Janvi AI Girl Image Frame (Clean Photorealistic Portrait in JanMitra Polo) */}
-        <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <img
-            src={janviAvatarReal}
-            alt="Janvi AI Assistant"
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              borderRadius: 22,
-              filter: state === 'thinking' ? 'brightness(1.1) contrast(1.05)' : 'none',
-            }}
-          />
+        {/* Three.js WebGL 3D Digital Human Avatar Canvas */}
+        <div style={{ position: 'relative', width: '100%', height: '100%' }}>
+          <ThreeDJanviAvatar state={state} />
         </div>
 
         {/* Audio Equalizer Synced when Janvi is Speaking */}
