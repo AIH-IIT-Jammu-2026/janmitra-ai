@@ -20,8 +20,7 @@ export default function LoginPage() {
       navigate('/chat')
     },
     onError: (err) => {
-      console.warn('Google Sign-In fallback active:', err)
-      // Fallback for demo mode
+      console.warn('Google Auth notice: redirecting to chat demo mode', err)
       navigate('/chat')
     },
   })
@@ -58,6 +57,7 @@ export default function LoginPage() {
     try {
       googleLogin()
     } catch {
+      // Fallback redirect to chat demo if Client ID is unconfigured or blocked
       navigate('/chat')
     }
   }
