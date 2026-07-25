@@ -6,7 +6,7 @@ export default function DIDAgentAvatar({ state = 'idle' }) {
   const agentId = import.meta.env.VITE_DID_AGENT_ID || 'v2_agt_61-8izVy'
 
   useEffect(() => {
-    // Inject or update D-ID Script targeting 'ai-assistant-container'
+    // Inject or update D-ID Script targeting 'janmitra-assistant-window'
     let script = document.getElementById('did-agent-script')
     if (script) {
       script.remove()
@@ -21,24 +21,24 @@ export default function DIDAgentAvatar({ state = 'idle' }) {
     script.setAttribute('data-agent-id', agentId)
     script.setAttribute('data-name', 'did-agent')
     script.setAttribute('data-monitor', 'true')
-    script.setAttribute('data-target-id', 'ai-assistant-container')
+    script.setAttribute('data-target-id', 'janmitra-assistant-window')
     document.head.appendChild(script)
   }, [clientKey, agentId])
 
   return (
     <div
-      id="ai-assistant-container"
+      id="janmitra-assistant-window"
       style={{
         width: '100%',
-        maxWidth: 400,
-        height: 320,
-        margin: '0 auto',
+        maxWidth: 450,
+        height: 380,
+        margin: '10px auto',
         borderRadius: 16,
         overflow: 'hidden',
         position: 'relative',
         background: 'linear-gradient(145deg, #071A35, #0B2447)',
-        border: '1.5px solid rgba(56,189,248,0.3)',
-        boxShadow: '0 0 35px rgba(56,189,248,0.2)',
+        border: '2px solid #00f2fe',
+        boxShadow: '0 8px 32px rgba(0, 242, 254, 0.25)',
       }}
     >
       {/* Photorealistic Indian Janvi AI Girl Backdrop while D-ID WebRTC Stream initializes */}
