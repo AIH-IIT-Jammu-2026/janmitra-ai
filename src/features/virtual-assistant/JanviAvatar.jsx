@@ -1,18 +1,18 @@
 import React, { useEffect, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
+import janviAvatarReal from '../../assets/janvi_avatar_real.png'
 
 export default function JanviAvatar({ state = 'idle' }) {
   const [phonemeStep, setPhonemeStep] = useState(0)
   const [blink, setBlink] = useState(false)
-  const [gaze, setGaze] = useState({ x: 0, y: 0 })
 
   // 1. Phoneme Mouth Morphing Loop when Speaking (A, E, O, M mouth shapes)
   useEffect(() => {
     let timer
     if (state === 'speaking') {
       timer = setInterval(() => {
-        setPhonemeStep((prev) => (prev + 1) % 5)
-      }, 100)
+        setPhonemeStep((prev) => (prev + 1) % 4)
+      }, 110)
     } else {
       setPhonemeStep(0)
     }
@@ -28,18 +28,6 @@ export default function JanviAvatar({ state = 'idle' }) {
     return () => clearInterval(blinkTimer)
   }, [])
 
-  // 3. Smooth Eye Gaze Tracking
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      const { innerWidth, innerHeight } = window
-      const x = ((e.clientX / innerWidth) - 0.5) * 3.5
-      const y = ((e.clientY / innerHeight) - 0.5) * 2.5
-      setGaze({ x, y })
-    }
-    window.addEventListener('mousemove', handleMouseMove)
-    return () => window.removeEventListener('mousemove', handleMouseMove)
-  }, [])
-
   // State Visual Configurations
   const stateConfig = {
     idle: {
@@ -48,9 +36,7 @@ export default function JanviAvatar({ state = 'idle' }) {
       badgeBg: 'rgba(56,189,248,0.15)',
       badgeBorder: 'rgba(56,189,248,0.4)',
       statusTag: '● LIVE',
-      text: '😊 Ready to Guide You',
-      eyebrowY: 0,
-      headRotate: 0,
+      text: '😊 Janvi Online · Ready',
     },
     listening: {
       color: '#2563EB',
@@ -59,8 +45,6 @@ export default function JanviAvatar({ state = 'idle' }) {
       badgeBorder: 'rgba(37,99,235,0.6)',
       statusTag: '👂 Listening...',
       text: '🎤 Listening to Citizen Voice',
-      eyebrowY: -2.5,
-      headRotate: 2,
     },
     looking: {
       color: '#06B6D4',
@@ -69,8 +53,6 @@ export default function JanviAvatar({ state = 'idle' }) {
       badgeBorder: 'rgba(6,182,212,0.6)',
       statusTag: '👀 Vision Scanning...',
       text: '👀 Analyzing Screen Webpage',
-      eyebrowY: -1,
-      headRotate: -2,
     },
     thinking: {
       color: '#8B5CF6',
@@ -79,8 +61,6 @@ export default function JanviAvatar({ state = 'idle' }) {
       badgeBorder: 'rgba(139,92,246,0.6)',
       statusTag: '🧠 Thinking...',
       text: '🧠 Consulting Multi-Agent Engine',
-      eyebrowY: -3,
-      headRotate: 3,
     },
     speaking: {
       color: '#10B981',
@@ -89,20 +69,17 @@ export default function JanviAvatar({ state = 'idle' }) {
       badgeBorder: 'rgba(16,185,129,0.6)',
       statusTag: '🔊 Speaking...',
       text: '🗣 Janvi Responding',
-      eyebrowY: -1,
-      headRotate: 0,
     },
   }
 
   const current = stateConfig[state] || stateConfig.idle
 
-  // Phoneme Mouth Morphing SVG Paths
-  const mouthPhonemes = [
-    'M 43 53 Q 50 59 57 53 Z', // Closed / Neutral M
-    'M 40 52 Q 50 68 60 52 Q 50 58 40 52 Z', // Wide Open A
-    'M 42 53 Q 50 57 58 53 Q 50 65 42 53 Z', // Smile Open E
-    'M 44 52 Q 50 65 56 52 Q 50 57 44 52 Z', // Rounded O
-    'M 42 53 Q 50 62 58 53 Q 50 57 42 53 Z', // Neutral Smile U/I
+  // Phoneme Mouth SVG Overlay Paths
+  const mouthPaths = [
+    'M 43 54 Q 50 58 57 54 Z', // Closed / Neutral M
+    'M 41 53 Q 50 66 59 53 Q 50 58 41 53 Z', // Wide Open A
+    'M 42 53 Q 50 57 58 53 Q 50 63 42 53 Z', // Smile Open E
+    'M 45 53 Q 50 63 55 53 Q 50 57 45 53 Z', // Rounded O
   ]
 
   return (
@@ -126,22 +103,22 @@ export default function JanviAvatar({ state = 'idle' }) {
         }}
       />
 
-      {/* Stylized 3D Mascot Avatar Card Container */}
+      {/* Main 3D Card Container (Real Janvi Photorealistic Portrait in JanMitra Polo) */}
       <motion.div
         animate={
           state === 'speaking'
-            ? { y: [0, -6, 0, -3, 0], rotate: [0, 1.5, -1.5, 0] }
+            ? { y: [0, -6, 0, -3, 0], rotate: [0, 1, -1, 0] }
             : state === 'looking'
-            ? { rotate: [-1.5, 2.5, -2.5, 1.5], scale: [1, 1.025, 1] }
+            ? { rotate: [-1, 2, -2, 1], scale: [1, 1.02, 1] }
             : state === 'thinking'
-            ? { y: [0, -4, 0], rotate: [0, -2, 2, 0] }
+            ? { y: [0, -4, 0], rotate: [0, -1.5, 1.5, 0] }
             : { y: [0, -5, 0], rotate: [-1, 1, -1] }
         }
         transition={{ duration: state === 'speaking' ? 0.5 : 3.5, repeat: Infinity, ease: 'easeInOut' }}
         style={{
-          width: 250,
-          height: 290,
-          borderRadius: 26,
+          width: 245,
+          height: 285,
+          borderRadius: 24,
           background: 'linear-gradient(145deg, rgba(7,26,53,0.98), rgba(11,36,71,0.95))',
           border: `2px solid ${current.color}`,
           boxShadow: `0 0 45px ${current.glow}, inset 0 0 25px rgba(56,189,248,0.2)`,
@@ -195,119 +172,42 @@ export default function JanviAvatar({ state = 'idle' }) {
           />
         )}
 
-        {/* Rotating 3D Thinking Halo when in Reasoning State */}
-        {state === 'thinking' && (
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+        {/* Real Janvi AI Girl Image Frame (Photorealistic AI Portrait in JanMitra Polo) */}
+        <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <img
+            src={janviAvatarReal}
+            alt="Janvi AI Assistant"
             style={{
-              position: 'absolute',
-              width: 170,
-              height: 170,
-              borderRadius: '50%',
-              border: '2px stroke rgba(139,92,246,0.5)',
-              borderTopColor: '#A78BFA',
-              zIndex: 8,
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover',
+              borderRadius: 22,
+              filter: state === 'thinking' ? 'brightness(1.1) contrast(1.05)' : 'none',
             }}
           />
-        )}
 
-        {/* 3D Stylized Vector AI Digital Human Character */}
-        <div style={{ position: 'relative', width: 210, height: 250, display: 'flex', justifyContent: 'center' }}>
-          <svg width="210" height="250" viewBox="0 0 100 120" fill="none">
-            <defs>
-              {/* 3D Skin Highlight Gradients */}
-              <radialGradient id="skin3D" cx="45%" cy="35%" r="55%">
-                <stop offset="0%" stopColor="#FFF2E6" />
-                <stop offset="60%" stopColor="#FED7AA" />
-                <stop offset="100%" stopColor="#FB923C" />
-              </radialGradient>
-              {/* 3D Polo Shirt Metallic Gradient */}
-              <linearGradient id="poloGrad" x1="0" y1="0" x2="100" y2="100">
-                <stop offset="0%" stopColor="#0F2942" />
-                <stop offset="50%" stopColor="#071A35" />
-                <stop offset="100%" stopColor="#1E3A8A" />
-              </linearGradient>
-              {/* Hair Metallic Gradient */}
-              <linearGradient id="hair3D" x1="0" y1="0" x2="0" y2="100">
-                <stop offset="0%" stopColor="#1E293B" />
-                <stop offset="100%" stopColor="#0F172A" />
-              </linearGradient>
-            </defs>
+          {/* SVG Expression Overlay (Eye Blinking & Lip Sync mouth movements over photorealistic face) */}
+          <svg
+            width="100%"
+            height="100%"
+            viewBox="0 0 100 120"
+            fill="none"
+            style={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}
+          >
+            {/* Eye Blinking Animation Overlay */}
+            {blink && (
+              <>
+                <ellipse cx="38" cy="48" rx="7" ry="5" fill="#1A1829" />
+                <ellipse cx="62" cy="48" rx="7" ry="5" fill="#1A1829" />
+                <line x1="31" y1="48" x2="45" y2="48" stroke="#3D291F" strokeWidth="2.5" strokeLinecap="round" />
+                <line x1="55" y1="48" x2="69" y2="48" stroke="#3D291F" strokeWidth="2.5" strokeLinecap="round" />
+              </>
+            )}
 
-            {/* Glowing Aura Ring */}
-            <circle cx="50" cy="40" r="38" fill={current.color} opacity="0.15" />
-            <circle cx="50" cy="40" r="36" stroke={current.color} strokeWidth="1.2" strokeDasharray="3 3" opacity="0.6" />
-
-            {/* Long Silky Hair (Back Layer) */}
-            <path d="M 22 45 C 18 20, 82 20, 78 45 C 76 65, 78 85, 82 105 L 18 105 C 22 85, 24 65, 22 45 Z" fill="url(#hair3D)" />
-
-            {/* Neck & Shoulders */}
-            <path d="M 44 62 L 56 62 L 58 72 L 42 72 Z" fill="#FB923C" />
-
-            {/* 👕 Official JanMitra AI Polo Shirt */}
-            <path d="M 16 72 Q 50 68 84 72 L 90 120 L 10 120 Z" fill="url(#poloGrad)" stroke="#38BDF8" strokeWidth="1.4" />
-            <path d="M 38 72 L 50 82 L 62 72" stroke="#2563EB" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-
-            {/* Indian Flag Emblem Badge on Left Chest */}
-            <g transform="translate(24, 82)">
-              <rect x="0" y="0" width="12" height="7" rx="1" fill="#FF9933" />
-              <rect x="0" y="2.3" width="12" height="2.4" fill="#FFFFFF" />
-              <circle cx="6" cy="3.5" r="1" fill="#000080" />
-              <rect x="0" y="4.7" width="12" height="2.3" fill="#138808" />
-            </g>
-
-            {/* Printed JanMitra AI Logo Text */}
-            <text x="56" y="87" textAnchor="middle" fill="#38BDF8" fontSize="6.5" fontWeight="bold" fontFamily="Space Grotesk, sans-serif">
-              JanMitra AI
-            </text>
-            <text x="56" y="93" textAnchor="middle" fill="#60A5FA" fontSize="4" fontWeight="600">
-              CITIZEN ASSISTANT
-            </text>
-
-            {/* Face Contour with 3D Skin Shading */}
-            <g transform={`rotate(${current.headRotate}, 50, 40)`}>
-              <path d="M 30 38 C 30 18, 70 18, 70 38 C 70 56, 62 64, 50 64 C 38 64, 30 56, 30 38 Z" fill="url(#skin3D)" />
-              <path d="M 30 32 C 38 22, 50 26, 50 32 C 50 26, 62 22, 70 32 C 70 20, 30 20, 30 32 Z" fill="#0F172A" />
-
-              {/* Eyebrows */}
-              <path d={`M 35 ${32 + current.eyebrowY} Q 42 ${29 + current.eyebrowY} 46 ${32 + current.eyebrowY}`} stroke="#1E293B" strokeWidth="2" strokeLinecap="round" fill="none" />
-              <path d={`M 54 ${32 + current.eyebrowY} Q 58 ${29 + current.eyebrowY} 65 ${32 + current.eyebrowY}`} stroke="#1E293B" strokeWidth="2" strokeLinecap="round" fill="none" />
-
-              {/* Realistic Eyes with Blinking & Gaze Tracking */}
-              {blink ? (
-                <>
-                  <line x1="36" y1="39" x2="46" y2="39" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
-                  <line x1="54" y1="39" x2="64" y2="39" stroke="#0F172A" strokeWidth="2.5" strokeLinecap="round" />
-                </>
-              ) : (
-                <>
-                  <ellipse cx="41" cy="39" rx="5" ry="3.5" fill="#FFFFFF" />
-                  <ellipse cx="59" cy="39" rx="5" ry="3.5" fill="#FFFFFF" />
-                  <circle cx={41 + gaze.x} cy={39 + gaze.y} r="2.8" fill="#1E3A8A" />
-                  <circle cx={59 + gaze.x} cy={39 + gaze.y} r="2.8" fill="#1E3A8A" />
-                  <circle cx={41 + gaze.x} cy={39 + gaze.y} r="1.5" fill="#0F172A" />
-                  <circle cx={59 + gaze.x} cy={39 + gaze.y} r="1.5" fill="#0F172A" />
-                  <circle cx={42.5 + gaze.x} cy={38 + gaze.y} r="0.8" fill="#FFFFFF" />
-                  <circle cx={60.5 + gaze.x} cy={38 + gaze.y} r="0.8" fill="#FFFFFF" />
-                </>
-              )}
-
-              {/* Red Bindi */}
-              <circle cx="50" cy="31" r="1.8" fill="#DC2626" />
-              <path d="M 50 39 L 48.5 47 L 51.5 47" stroke="#EA580C" strokeWidth="1" opacity="0.6" strokeLinecap="round" fill="none" />
-              <ellipse cx="36" cy="46" rx="4" ry="2" fill="#F43F5E" opacity="0.25" />
-              <ellipse cx="64" cy="46" rx="4" ry="2" fill="#F43F5E" opacity="0.25" />
-
-              {/* 💋 Synced Phoneme Morphing Lips */}
-              {state === 'speaking' ? (
-                <path d={mouthPhonemes[phonemeStep]} fill="#E11D48" stroke="#9F1239" strokeWidth="1" />
-              ) : state === 'listening' ? (
-                <path d="M 43 53 Q 50 61 57 53" stroke="#BE123C" strokeWidth="2.2" strokeLinecap="round" fill="none" />
-              ) : (
-                <path d="M 43 53 Q 50 59 57 53" stroke="#BE123C" strokeWidth="2" strokeLinecap="round" fill="none" />
-              )}
-            </g>
+            {/* Lip Sync Phoneme Mouth Overlay when Speaking */}
+            {state === 'speaking' && (
+              <path d={mouthPaths[phonemeStep]} fill="#E11D48" stroke="#9F1239" strokeWidth="1" />
+            )}
           </svg>
         </div>
 

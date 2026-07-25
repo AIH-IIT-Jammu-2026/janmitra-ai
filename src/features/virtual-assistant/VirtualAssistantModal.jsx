@@ -7,6 +7,7 @@ import CallControls from './CallControls'
 import SessionSummaryModal from './SessionSummaryModal'
 import ScreenHighlightOverlay from './ScreenHighlightOverlay'
 import MultimodalTimeline from './MultimodalTimeline'
+import ContextPanel from './ContextPanel'
 import SmartFollowups from './SmartFollowups'
 import EducationModePreset from './EducationModePreset'
 import LogoIcon from '../../components/common/LogoIcon'
@@ -513,73 +514,14 @@ export default function VirtualAssistantModal() {
               </div>
             </div>
 
-            {/* RIGHT COLUMN: Active Multi-Agent Radar & Multimodal Timeline */}
-            <div
-              style={{
-                width: 280,
-                display: 'flex',
-                flexDirection: 'column',
-                gap: 14,
-                background: 'rgba(7,26,53,0.6)',
-                border: '1px solid rgba(56,189,248,0.15)',
-                borderRadius: 20,
-                padding: 16,
-                backdropFilter: 'blur(15px)',
-                overflowY: 'auto',
-              }}
-            >
-              {/* Task Goal Progress Bar */}
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 4 }}>
-                  Task Goal Progress
-                </div>
-                <div style={{ fontSize: 13.5, fontWeight: 700, color: '#F0F6FF', marginBottom: 6 }}>{currentGoal.title}</div>
-                <div style={{ width: '100%', height: 6, background: 'rgba(255,255,255,0.1)', borderRadius: 3, overflow: 'hidden', marginBottom: 6 }}>
-                  <motion.div animate={{ width: `${currentGoal.progress}%` }} style={{ height: '100%', background: '#38BDF8' }} />
-                </div>
-                <div style={{ fontSize: 11, color: 'rgba(240,246,255,0.5)', display: 'flex', justifyContent: 'space-between' }}>
-                  <span>Confidence: <strong style={{ color: '#34D399' }}>98%</strong></span>
-                  <span>{currentGoal.progress}%</span>
-                </div>
-              </div>
-
-              {/* Phase 11 Multimodal Timeline Component */}
-              <MultimodalTimeline events={timelineEvents} />
-
-              {/* Multi-Agent Radar (Active vs Standby States) */}
-              <div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
-                  Active Agent Radar
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-                  {ALL_AGENTS_RADAR.map((ag) => {
-                    const isActive = activeAgents.some((act) => act.toLowerCase().includes(ag.name.toLowerCase().split(' ')[0])) || ag.name === 'Vision Agent' || ag.name === 'Government Agent' || ag.name === 'Agriculture Agent'
-                    return (
-                      <div
-                        key={ag.name}
-                        style={{
-                          padding: '6px 10px',
-                          background: isActive ? 'rgba(16,185,129,0.12)' : 'rgba(11,36,71,0.4)',
-                          border: `1px solid ${isActive ? 'rgba(16,185,129,0.3)' : 'rgba(255,255,255,0.06)'}`,
-                          borderRadius: 8,
-                          fontSize: 11,
-                        }}
-                      >
-                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                          <span style={{ fontWeight: 700, color: isActive ? '#34D399' : 'rgba(240,246,255,0.4)' }}>
-                            {isActive ? '🟢' : '⚪'} {ag.name}
-                          </span>
-                          <span style={{ fontSize: 9.5, color: isActive ? '#34D399' : 'rgba(240,246,255,0.3)', fontWeight: 600 }}>
-                            {isActive ? 'Active' : 'Standby'}
-                          </span>
-                        </div>
-                        <div style={{ fontSize: 10, color: 'rgba(240,246,255,0.5)', marginTop: 2 }}>{ag.desc}</div>
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </div>
+            {/* RIGHT COLUMN: ContextPanel (Task Goal, Currently Viewing, Agent Pipeline, Timeline) */}
+            <ContextPanel
+              currentGoal={currentGoal}
+              activeAgents={activeAgents}
+              thinkingStep={thinkingStep}
+              timelineEvents={timelineEvents}
+              currentWebsite={currentWebsiteState}
+            />
           </>
         )}
       </div>
