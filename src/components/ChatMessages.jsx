@@ -5,6 +5,7 @@ import AgentCards from './chat/AgentCards'
 import ActionPlan from './chat/ActionPlan'
 import SourceCards from './chat/SourceCards'
 import EligibilityCard from './chat/EligibilityCard'
+import VoicePlayerBar from './chat/VoicePlayerBar'
 
 function TypingAnimation() {
   return (
@@ -74,6 +75,7 @@ export function AIMessage({ message }) {
   const agentsList = message.agents || []
   const actionItems = message.actionPlan || message.action_plan || []
   const sourcesList = message.sources || []
+  const messageId = message.id || Date.now()
   const [eligibilityData, setEligibilityData] = useState(message.eligibilityData || null)
 
   useEffect(() => {
@@ -150,7 +152,12 @@ export function AIMessage({ message }) {
               </ReactMarkdown>
             </div>
 
-            {/* 3. Document AI Eligibility Card */}
+            {/* 3. Voice Player Bar */}
+            {contentText && (
+              <VoicePlayerBar messageId={messageId} originalText={contentText} />
+            )}
+
+            {/* 4. Document AI Eligibility Card */}
             {eligibilityData && (
               <EligibilityCard
                 data={eligibilityData}
@@ -158,10 +165,10 @@ export function AIMessage({ message }) {
               />
             )}
 
-            {/* 4. Action Plan */}
+            {/* 5. Action Plan */}
             <ActionPlan items={actionItems} />
 
-            {/* 5. Official Sources */}
+            {/* 6. Official Sources */}
             <SourceCards sources={sourcesList} />
           </div>
         </div>
