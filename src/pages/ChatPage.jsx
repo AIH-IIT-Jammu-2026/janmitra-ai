@@ -10,6 +10,7 @@ import { sendChatMessage } from '../clients/chatClient'
 import { startSpeechRecognition } from '../utils/speechRecognition'
 import { useLanguage } from '../context/LanguageContext'
 import { useAssistant } from '../context/AssistantContext'
+import LogoIcon from '../components/common/LogoIcon'
 
 const SUGGESTED_PROMPTS = [
   { label: '🌾 PM-KISAN & Farmer Schemes', query: 'I am a farmer from Maharashtra. Which government schemes am I eligible for?' },
@@ -157,12 +158,7 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'linear-gradient(135deg, #2563EB, #38BDF8)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
-              boxShadow: '0 0 12px rgba(37,99,235,0.5)',
-            }}>🤖</div>
+            <LogoIcon size={32} />
             <div>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif' }}>JanMitra AI Assistant</div>
               <div style={{ fontSize: 11, color: 'rgba(240,246,255,0.45)', display: 'flex', alignItems: 'center', gap: 6 }}>

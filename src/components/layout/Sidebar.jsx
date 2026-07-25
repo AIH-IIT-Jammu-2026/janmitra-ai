@@ -2,6 +2,7 @@ import React from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { useLanguage } from '../../context/LanguageContext'
 import LanguageSwitcher from '../common/LanguageSwitcher'
+import LogoIcon from '../common/LogoIcon'
 
 export default function Sidebar() {
   const location = useLocation()
@@ -30,21 +31,7 @@ export default function Sidebar() {
       {/* Brand Header */}
       <div style={{ padding: '24px 20px', borderBottom: '1px solid rgba(56,189,248,0.08)' }}>
         <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div
-            style={{
-              width: 38,
-              height: 38,
-              background: 'linear-gradient(135deg, #2563EB, #38BDF8)',
-              borderRadius: 10,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 20,
-              boxShadow: '0 0 20px rgba(37,99,235,0.4)',
-            }}
-          >
-            🇮🇳
-          </div>
+          <LogoIcon size={38} />
           <div>
             <div style={{ fontWeight: 700, fontSize: 16, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif' }}>
               JanMitra AI
