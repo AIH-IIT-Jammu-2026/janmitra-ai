@@ -1,49 +1,65 @@
-import React, { useEffect, useRef } from 'react'
+import React, { useEffect, useState } from 'react'
+import janviAvatarReal from '../../assets/janvi_avatar_real.png'
 
 export default function DIDAgentAvatar({ state = 'idle' }) {
-  const containerRef = useRef(null)
-
+  const [scriptLoaded, setScriptLoaded] = useState(false)
   const clientKey = import.meta.env.VITE_DID_CLIENT_KEY || 'ck_vg6jNcoaCgGoWmuhnzPql'
   const agentId = import.meta.env.VITE_DID_AGENT_ID || 'v2_agt_61-8izVy'
 
   useEffect(() => {
-    // Style or mount D-ID agent web element dynamically inside avatar frame
-    const didAgentEl = document.querySelector('did-agent') || document.querySelector('iframe[src*="d-id"]')
-    if (didAgentEl) {
-      didAgentEl.style.position = 'relative'
-      didAgentEl.style.zIndex = '99'
+    // Dynamically inject D-ID Script with target-id set to 'did-avatar-container'
+    const existingScript = document.getElementById('did-agent-script')
+    if (existingScript) {
+      existingScript.remove()
     }
-  }, [state])
+
+    const script = document.createElement('script')
+    script.id = 'did-agent-script'
+    script.type = 'module'
+    script.src = 'https://agent.d-id.com/v2/index.js'
+    script.setAttribute('data-mode', 'full')
+    script.setAttribute('data-client-key', clientKey)
+    script.setAttribute('data-agent-id', agentId)
+    script.setAttribute('data-name', 'did-agent')
+    script.setAttribute('data-monitor', 'true')
+    script.setAttribute('data-target-id', 'did-avatar-container')
+    script.onload = () => setScriptLoaded(true)
+    document.head.appendChild(script)
+
+    return () => {
+      // Cleanup script when modal closes
+    }
+  }, [clientKey, agentId])
 
   return (
     <div
-      ref={containerRef}
+      id="did-avatar-container"
       style={{
         width: '100%',
         height: '100%',
         position: 'relative',
         display: 'flex',
-        flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
         borderRadius: 22,
         overflow: 'hidden',
         background: 'linear-gradient(145deg, #071A35, #0B2447)',
-        border: '1px solid rgba(56,189,248,0.3)',
       }}
     >
-      <div style={{ textAlign: 'center', padding: 12, zIndex: 2 }}>
-        <div style={{ fontSize: 28, marginBottom: 4 }}>🤖</div>
-        <div style={{ fontSize: 13.5, fontWeight: 800, color: '#38BDF8', letterSpacing: 0.5 }}>
-          D-ID Streaming Digital Human
-        </div>
-        <div style={{ fontSize: 11, color: '#67E8F9', fontWeight: 600, marginTop: 4 }}>
-          Agent ID: <span style={{ fontFamily: 'monospace', color: '#34D399' }}>{agentId}</span>
-        </div>
-        <div style={{ fontSize: 10, color: 'rgba(240,246,255,0.5)', marginTop: 4 }}>
-          Client Key Verified & Active
-        </div>
-      </div>
+      {/* Background Image / Loading Frame until D-ID Streaming Video Connects */}
+      <img
+        src={janviAvatarReal}
+        alt="Janvi Digital Human"
+        style={{
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
+          position: 'absolute',
+          inset: 0,
+          opacity: 0.9,
+          zIndex: 1,
+        }}
+      />
     </div>
   )
 }
