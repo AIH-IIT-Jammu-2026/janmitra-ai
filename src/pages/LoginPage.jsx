@@ -5,6 +5,13 @@ import { useGoogleLogin } from '@react-oauth/google'
 import { supabase, isSupabaseConfigured } from '../clients/supabaseClient'
 import NeuralBackground from '../components/NeuralBackground'
 
+const rawGoogleClientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || ''
+const isRealGoogleClientId =
+  Boolean(rawGoogleClientId) &&
+  !rawGoogleClientId.includes('your-google-client-id') &&
+  !rawGoogleClientId.includes('dummy-client-id') &&
+  rawGoogleClientId.endsWith('.apps.googleusercontent.com')
+
 export default function LoginPage() {
   const [isSignUp, setIsSignUp] = useState(false)
   const [email, setEmail] = useState('')
@@ -17,11 +24,11 @@ export default function LoginPage() {
   // Google OAuth Popup Hook
   const googlePopupLogin = useGoogleLogin({
     onSuccess: (tokenResponse) => {
-      console.log('Google Auth Popup Success:', tokenResponse)
+      console.log('Google Auth Success:', tokenResponse)
       navigate('/chat')
     },
     onError: (err) => {
-      console.warn('Google Auth Popup notice:', err)
+      console.warn('Google Auth Popup Notice:', err)
       navigate('/chat')
     },
   })
@@ -31,7 +38,7 @@ export default function LoginPage() {
     setLoading(true)
     setError('')
 
-    // 1. Try Supabase OAuth if configured
+    // 1. If Supabase is configured with real keys, use Supabase OAuth
     if (isSupabaseConfigured) {
       try {
         const { error } = await supabase.auth.signInWithOAuth({
@@ -40,25 +47,25 @@ export default function LoginPage() {
             redirectTo: `${window.location.origin}/chat`,
           },
         })
-        if (error) {
-          console.warn('Supabase Auth Notice:', error.message)
-          navigate('/chat')
-        }
-        return
+        if (!error) return
       } catch (err) {
-        console.warn('Supabase OAuth error:', err)
+        console.warn('Supabase OAuth Error:', err)
       }
     }
 
-    // 2. Try Google OAuth Popup
-    try {
-      googlePopupLogin()
-    } catch {
-      // 3. Fallback direct demo access
-      navigate('/chat')
-    } finally {
-      setLoading(false)
+    // 2. If a real Google Client ID is configured in .env, trigger Google OAuth popup
+    if (isRealGoogleClientId) {
+      try {
+        googlePopupLogin()
+        return
+      } catch (err) {
+        console.warn('Google Popup Trigger Error:', err)
+      }
     }
+
+    // 3. Clean demo sign in (bypasses Google Error 401 popup for placeholder keys)
+    setLoading(false)
+    navigate('/chat')
   }
 
   // Password validation rules
