@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
-import { supabase } from '../clients/supabaseClient'
+import { supabase, isSupabaseConfigured } from '../clients/supabaseClient'
 import NeuralBackground from '../components/NeuralBackground'
 
 export default function LoginPage() {
@@ -13,28 +13,35 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Supabase Google Auth
+  // Google Login Handler
   const handleGoogleClick = async () => {
     setLoading(true)
     setError('')
-    try {
-      const { data, error } = await supabase.auth.signInWithOAuth({
-        provider: 'google',
-        options: {
-          redirectTo: `${window.location.origin}/chat`,
-        },
-      })
 
-      if (error) {
-        console.warn('Supabase Google Auth Notice:', error.message)
-        // Fallback for local demo mode if URL/Key not configured
+    if (isSupabaseConfigured) {
+      try {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: `${window.location.origin}/chat`,
+          },
+        })
+        if (error) {
+          console.warn('Supabase Auth Notice:', error.message)
+          navigate('/chat')
+        }
+      } catch (err) {
+        console.warn('Supabase Auth Catch:', err)
         navigate('/chat')
+      } finally {
+        setLoading(false)
       }
-    } catch (err) {
-      console.warn('Supabase Auth Catch:', err)
-      navigate('/chat')
-    } finally {
-      setLoading(false)
+    } else {
+      // Demo mode fallback when Supabase URL/Key is not set in .env
+      setTimeout(() => {
+        setLoading(false)
+        navigate('/chat')
+      }, 500)
     }
   }
 
@@ -63,30 +70,33 @@ export default function LoginPage() {
 
     setLoading(true)
 
-    try {
-      if (isSignUp) {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { data: { full_name: name } },
-        })
-        if (error) {
-          console.warn('Supabase Sign Up Notice:', error.message)
+    if (isSupabaseConfigured) {
+      try {
+        if (isSignUp) {
+          const { error } = await supabase.auth.signUp({
+            email,
+            password,
+            options: { data: { full_name: name } },
+          })
+          if (error) console.warn('Supabase Sign Up Notice:', error.message)
+        } else {
+          const { error } = await supabase.auth.signInWithPassword({
+            email,
+            password,
+          })
+          if (error) console.warn('Supabase Sign In Notice:', error.message)
         }
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-        if (error) {
-          console.warn('Supabase Sign In Notice:', error.message)
-        }
+        navigate('/chat')
+      } catch {
+        navigate('/chat')
+      } finally {
+        setLoading(false)
       }
-      navigate('/chat')
-    } catch {
-      navigate('/chat')
-    } finally {
-      setLoading(false)
+    } else {
+      setTimeout(() => {
+        setLoading(false)
+        navigate('/chat')
+      }, 600)
     }
   }
 
@@ -186,7 +196,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Google Sign In via Supabase */}
+          {/* Google Sign In */}
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
