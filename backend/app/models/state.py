@@ -19,3 +19,4 @@ class AgentState(TypedDict, total=False):
     final_response: Dict[str, Any]
     retrieved_documents: Annotated[List[Dict[str, Any]], operator.add]
     errors: Annotated[List[Union[str, AgentError]], operator.add]
+    agent_latencies: Annotated[List[Dict[str, Any]], operator.add]

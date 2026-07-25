@@ -3,10 +3,11 @@ import Sidebar from '../components/layout/Sidebar'
 import { UserMessage, AIMessage } from '../components/chat/ChatMessage'
 import ChatInput from '../components/chat/ChatInput'
 import LoadingSpinner from '../components/ui/LoadingSpinner'
+import AgentGraphVisualizer from '../components/chat/AgentGraphVisualizer'
 import { useChat } from '../hooks/useChat'
 
 export default function Chat() {
-  const { messages, loading, sendMessage } = useChat()
+  const { messages, loading, sendMessage, activeAgents, agentLatencies } = useChat()
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
@@ -38,6 +39,21 @@ export default function Chat() {
           </div>
         </div>
 
+{/* Live Agent Execution Graph */}
+<div
+  style={{
+    padding: '16px 24px',
+    borderBottom: '1px solid rgba(56,189,248,0.1)',
+    background: '#07111f',
+  }}
+>
+  <AgentGraphVisualizer
+    loading={loading}
+    activeAgents={activeAgents}
+    latencies={agentLatencies}
+  />
+
+</div>
         {/* Message Stream */}
         <div style={{ flex: 1, overflowY: 'auto', padding: '20px 0' }}>
           {messages.map((msg) =>
