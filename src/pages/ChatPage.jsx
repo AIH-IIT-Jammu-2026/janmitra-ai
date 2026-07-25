@@ -8,6 +8,7 @@ import LoadingOverlay from '../components/chat/LoadingOverlay'
 import DocumentUploadModal from '../components/chat/DocumentUploadModal'
 import { sendChatMessage } from '../clients/chatClient'
 import { startSpeechRecognition } from '../utils/speechRecognition'
+import { useLanguage } from '../context/LanguageContext'
 
 const SUGGESTED_PROMPTS = [
   { label: '🌾 PM-KISAN & Farmer Schemes', query: 'I am a farmer from Maharashtra. Which government schemes am I eligible for?' },
@@ -18,6 +19,7 @@ const SUGGESTED_PROMPTS = [
 
 export default function ChatPage() {
   const location = useLocation()
+  const { t, currentLanguage } = useLanguage()
   const [messages, setMessages] = useState([
     {
       id: 0,
@@ -122,7 +124,7 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
   const handleVoiceInput = () => {
     setListening(true)
     startSpeechRecognition(
-      'en-IN',
+      currentLanguage || 'en-IN',
       (res) => {
         if (res && res.text) {
           setInput(res.text)
@@ -232,7 +234,7 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
                   handleSend(input)
                 }
               }}
-              placeholder="Ask about government schemes or click 📎 to upload certificate..."
+              placeholder={t('ask_placeholder')}
               rows={1}
               style={{
                 flex: 1, background: 'none', border: 'none', outline: 'none',
@@ -256,7 +258,7 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
                 display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
                 flexShrink: 0, margin: '4px 2px',
               }}
-              title="Upload Certificate for Document AI Eligibility Verification"
+              title={t('upload_document')}
             >
               📎
             </motion.button>
