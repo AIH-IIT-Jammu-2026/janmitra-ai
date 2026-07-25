@@ -13,13 +13,13 @@ export default function LoginPage() {
   const [error, setError] = useState('')
   const navigate = useNavigate()
 
-  // Google Login Handler
+  // Google Sign In Handler
   const handleGoogleClick = async () => {
     setLoading(true)
     setError('')
 
-    if (isSupabaseConfigured) {
-      try {
+    try {
+      if (isSupabaseConfigured) {
         const { error } = await supabase.auth.signInWithOAuth({
           provider: 'google',
           options: {
@@ -30,18 +30,15 @@ export default function LoginPage() {
           console.warn('Supabase Auth Notice:', error.message)
           navigate('/chat')
         }
-      } catch (err) {
-        console.warn('Supabase Auth Catch:', err)
+      } else {
+        // Instant login to AI Assistant demo
         navigate('/chat')
-      } finally {
-        setLoading(false)
       }
-    } else {
-      // Demo mode fallback when Supabase URL/Key is not set in .env
-      setTimeout(() => {
-        setLoading(false)
-        navigate('/chat')
-      }, 500)
+    } catch (err) {
+      console.warn('Google login catch handler:', err)
+      navigate('/chat')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -70,33 +67,26 @@ export default function LoginPage() {
 
     setLoading(true)
 
-    if (isSupabaseConfigured) {
-      try {
+    try {
+      if (isSupabaseConfigured) {
         if (isSignUp) {
-          const { error } = await supabase.auth.signUp({
+          await supabase.auth.signUp({
             email,
             password,
             options: { data: { full_name: name } },
           })
-          if (error) console.warn('Supabase Sign Up Notice:', error.message)
         } else {
-          const { error } = await supabase.auth.signInWithPassword({
+          await supabase.auth.signInWithPassword({
             email,
             password,
           })
-          if (error) console.warn('Supabase Sign In Notice:', error.message)
         }
-        navigate('/chat')
-      } catch {
-        navigate('/chat')
-      } finally {
-        setLoading(false)
       }
-    } else {
-      setTimeout(() => {
-        setLoading(false)
-        navigate('/chat')
-      }, 600)
+      navigate('/chat')
+    } catch {
+      navigate('/chat')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -196,7 +186,7 @@ export default function LoginPage() {
             </button>
           </div>
 
-          {/* Google Sign In */}
+          {/* Google Sign In Button */}
           <motion.button
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
