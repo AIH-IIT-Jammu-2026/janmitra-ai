@@ -13,9 +13,9 @@ export function renderHeader(doc, reportData, startY) {
 
   // Title Text on Banner
   doc.setTextColor(255, 255, 255)
-  doc.setFontSize(14)
+  doc.setFontSize(13)
   doc.setFont('helvetica', 'bold')
-  doc.text('JanMitra AI — Citizen Action Plan & Scheme Report', margin, 15)
+  doc.text('JanMitra AI — Personalized Citizen Assistance Report', margin, 15)
 
   // Subtitle Metadata
   doc.setFontSize(9)

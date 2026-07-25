@@ -10,8 +10,8 @@ export function validateReportData(data) {
       language: data.report?.language || 'en-IN',
       status: data.report?.status || 'Verified',
       version: data.report?.version || '1.0',
-      source: data.report?.source || '✓ Chat Assistance & Document AI Verification',
-      title: data.report?.title || 'Citizen Action Plan & Scheme Eligibility Report',
+      source: data.report?.source || '✓ JanMitra AI Multi-Agent Citizen Assistance Platform',
+      title: data.report?.title || 'JanMitra AI — Personalized Citizen Assistance Report',
     },
     citizen: {
       state: data.citizen?.state || 'Maharashtra',
@@ -20,25 +20,33 @@ export function validateReportData(data) {
       category: data.citizen?.category || 'General / OBC',
       land_acres: data.citizen?.land_acres || '1.5 Acres',
     },
+    active_agents: data.agents || data.active_agents || ['Router Agent', 'Government Scheme Agent', 'Agriculture Agent', 'Healthcare Agent'],
     stats: {
-      matched_schemes: data.eligible_schemes?.length || 2,
+      matched_schemes: data.recommendations?.length || data.eligible_schemes?.length || 3,
       required_documents: data.documents_required?.length || 4,
       action_steps: data.action_plan?.length || 3,
     },
-    eligible_schemes: data.eligible_schemes || [
+    recommendations: data.recommendations || data.eligible_schemes || [
       {
-        name: 'PM-KISAN Samman Nidhi',
-        category: '🌾 Agriculture',
+        name: 'PM-KISAN Samman Nidhi (Agriculture)',
+        category: '🌾 Agriculture & Farmer Support',
         benefit: '₹6,000 / year direct income support',
         badge: 'Highly Eligible',
         why_eligible: ['✓ Small farmer holding < 5 acres', '✓ Resident of Maharashtra'],
       },
       {
-        name: 'Ayushman Bharat PM-JAY',
-        category: '🩺 Healthcare',
+        name: 'Ayushman Bharat PM-JAY (Healthcare)',
+        category: '🩺 Healthcare & Hospitalization',
         benefit: '₹5 Lakh free health cover per family/year',
         badge: 'Highly Eligible',
-        why_eligible: ['✓ EWS category household income', '✓ Empaneled hospital cashless care'],
+        why_eligible: ['✓ EWS category household income', '✓ Cashless treatment at empaneled hospitals'],
+      },
+      {
+        name: 'National Scholarship Portal (Education)',
+        category: '🎓 Education & Scholarships',
+        benefit: 'Post-Matric scholarship for higher studies',
+        badge: 'Eligible',
+        why_eligible: ['✓ OBC / EWS Category quota', '✓ Income below ₹2.5L ceiling'],
       },
     ],
     documents_required: data.documents_required || [
@@ -56,6 +64,7 @@ export function validateReportData(data) {
       { name: 'MyScheme Official Portal', url: 'https://myscheme.gov.in' },
       { name: 'PM-KISAN Direct Portal', url: 'https://pmkisan.gov.in' },
       { name: 'Ayushman Bharat PM-JAY', url: 'https://pmjay.gov.in' },
+      { name: 'National Scholarship Portal', url: 'https://scholarships.gov.in' },
     ],
   }
 
