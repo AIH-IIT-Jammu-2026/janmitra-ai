@@ -4,6 +4,7 @@ import ReactMarkdown from 'react-markdown'
 import AgentCards from './chat/AgentCards'
 import ActionPlan from './chat/ActionPlan'
 import SourceCards from './chat/SourceCards'
+import EligibilityCard from './chat/EligibilityCard'
 
 function TypingAnimation() {
   return (
@@ -73,6 +74,13 @@ export function AIMessage({ message }) {
   const agentsList = message.agents || []
   const actionItems = message.actionPlan || message.action_plan || []
   const sourcesList = message.sources || []
+  const [eligibilityData, setEligibilityData] = useState(message.eligibilityData || null)
+
+  useEffect(() => {
+    if (message.eligibilityData) {
+      setEligibilityData(message.eligibilityData)
+    }
+  }, [message.eligibilityData])
 
   return (
     <motion.div
@@ -142,10 +150,18 @@ export function AIMessage({ message }) {
               </ReactMarkdown>
             </div>
 
-            {/* 3. Action Plan */}
+            {/* 3. Document AI Eligibility Card */}
+            {eligibilityData && (
+              <EligibilityCard
+                data={eligibilityData}
+                onRecalculate={(updatedData) => setEligibilityData(updatedData)}
+              />
+            )}
+
+            {/* 4. Action Plan */}
             <ActionPlan items={actionItems} />
 
-            {/* 4. Official Sources */}
+            {/* 5. Official Sources */}
             <SourceCards sources={sourcesList} />
           </div>
         </div>

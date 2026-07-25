@@ -5,6 +5,7 @@ import Sidebar from '../components/layout/Sidebar'
 import NeuralBackground from '../components/NeuralBackground'
 import { UserMessage, AIMessage, TypingAnimation } from '../components/ChatMessages'
 import LoadingOverlay from '../components/chat/LoadingOverlay'
+import DocumentUploadModal from '../components/chat/DocumentUploadModal'
 import { sendChatMessage } from '../clients/chatClient'
 
 const SUGGESTED_PROMPTS = [
@@ -23,7 +24,7 @@ export default function ChatPage() {
       agents: ['Router Agent'],
       actionPlan: [
         { title: 'Explore Schemes', description: 'Ask about PM-KISAN, PMAY, or Ayushman Bharat' },
-        { title: 'Scholarship Guidance', description: 'Find National Scholarship Portal eligibility' },
+        { title: 'Upload Document AI', description: 'Click 📎 to verify Income / Farmer Certificate eligibility' },
       ],
       sources: [
         { name: 'MyScheme Portal', url: 'https://myscheme.gov.in' }
@@ -32,12 +33,13 @@ export default function ChatPage() {
 
 I am your intelligent multi-agent citizen assistant. Ask me anything regarding **Government Schemes, Healthcare, Education, Employment, Agriculture, or Legal Guidance**.
 
-*Powered by LangGraph multi-agent orchestration, RAG vector retrieval, and Gemini.*`,
+*Powered by LangGraph multi-agent orchestration, Gemini Vision Document AI, and RAG vector retrieval.*`,
     }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
   const [listening, setListening] = useState(false)
+  const [showDocModal, setShowDocModal] = useState(false)
   const messagesEndRef = useRef(null)
 
   useEffect(() => {
@@ -88,6 +90,32 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleDocumentVerified = (docResult) => {
+    const userMsg = {
+      id: Date.now(),
+      type: 'user',
+      content: `Uploaded ${docResult.document?.type || 'Certificate'} for Document AI Verification`,
+    }
+
+    const aiMsg = {
+      id: Date.now() + 1,
+      type: 'ai',
+      agents: ['Document AI Vision Agent', 'Eligibility Rule Engine', 'RAG Retriever'],
+      actionPlan: [
+        { title: 'Review Extracted Profile', description: 'Check extracted income & land holding accuracy' },
+        { title: 'Apply on Official Portals', description: 'Click Open Official Portal ↗ for matched schemes' },
+      ],
+      sources: [
+        { name: 'MyScheme Portal', url: 'https://myscheme.gov.in' },
+        { name: 'PM-KISAN Portal', url: 'https://pmkisan.gov.in' },
+      ],
+      content: `### 📄 Document Analysis & Eligibility Verification Complete!\n\nI parsed your **${docResult.document?.type || 'Certificate'}** issued by **${docResult.document?.issuer || 'Government Authority'}** using Gemini Vision AI and matched your profile against the curated government schemes knowledge base.`,
+      eligibilityData: docResult,
+    }
+
+    setMessages((prev) => [...prev, userMsg, aiMsg])
   }
 
   const handleVoiceInput = () => {
@@ -145,7 +173,7 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
               <div style={{ fontSize: 14, fontWeight: 700, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif' }}>JanMitra AI Assistant</div>
               <div style={{ fontSize: 11, color: 'rgba(240,246,255,0.45)', display: 'flex', alignItems: 'center', gap: 6 }}>
                 <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#34D399', display: 'inline-block', boxShadow: '0 0 6px #34D399' }} />
-                Online · LangGraph Multi-Agent RAG Core Active
+                Online · Vision Document AI & Multi-Agent RAG Active
               </div>
             </div>
           </div>
@@ -214,7 +242,7 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
                   handleSend(input)
                 }
               }}
-              placeholder="Ask about government schemes, health, scholarships, farming, loans..."
+              placeholder="Ask about government schemes or click 📎 to upload certificate..."
               rows={1}
               style={{
                 flex: 1, background: 'none', border: 'none', outline: 'none',
@@ -224,6 +252,24 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
                 maxHeight: 120, overflowY: 'auto',
               }}
             />
+
+            {/* Document Upload Button */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setShowDocModal(true)}
+              style={{
+                background: 'rgba(56,189,248,0.12)',
+                border: '1px solid rgba(56,189,248,0.3)',
+                borderRadius: 10, color: '#38BDF8',
+                cursor: 'pointer', width: 36, height: 36,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 16,
+                flexShrink: 0, margin: '4px 2px',
+              }}
+              title="Upload Certificate for Document AI Eligibility Verification"
+            >
+              📎
+            </motion.button>
 
             {/* Voice Input */}
             <motion.button
@@ -269,6 +315,13 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
             JanMitra AI matches queries using real RAG vector retrieval & LangGraph multi-agent orchestration.
           </p>
         </div>
+
+        {/* Document Upload Modal */}
+        <DocumentUploadModal
+          show={showDocModal}
+          onClose={() => setShowDocModal(false)}
+          onVerified={handleDocumentVerified}
+        />
 
         {/* Stage Loading Overlay */}
         <LoadingOverlay show={loading} />
