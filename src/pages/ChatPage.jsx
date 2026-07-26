@@ -13,10 +13,10 @@ import { useAssistant } from '../context/AssistantContext'
 import LogoIcon from '../components/common/LogoIcon'
 
 const SUGGESTED_PROMPTS = [
-  { label: '🌾 PM-KISAN & Farmer Schemes', query: 'I am a farmer from Maharashtra. Which government schemes am I eligible for?' },
-  { label: '🩺 Ayushman Bharat & Free Medicine', query: 'What is Ayushman Bharat health insurance and Jan Aushadhi generic medicines?' },
-  { label: '🎓 NSP Scholarships & Education', query: 'Show me National Scholarship Portal schemes for SC/ST and college students' },
-  { label: '🏠 PMAY Housing & Loans', query: 'How to apply for PMAY housing subsidy and PM SVANidhi street vendor loans?' },
+  { icon: '🌾', label: 'Farmer Schemes & Subsidies', query: 'I am a farmer from Maharashtra. Which government schemes am I eligible for?' },
+  { icon: '🩺', label: 'Healthcare & Insurance', query: 'What is Ayushman Bharat health insurance and Jan Aushadhi generic medicines?' },
+  { icon: '🎓', label: 'Scholarships & Education', query: 'Show me National Scholarship Portal schemes for SC/ST and college students' },
+  { icon: '🏠', label: 'Housing & Micro-Loans', query: 'How to apply for PMAY housing subsidy and PM SVANidhi street vendor loans?' },
 ]
 
 export default function ChatPage() {
@@ -27,19 +27,12 @@ export default function ChatPage() {
     {
       id: 0,
       type: 'ai',
-      agents: ['Router Agent'],
-      actionPlan: [
-        { title: 'Explore Schemes', description: 'Ask about PM-KISAN, PMAY, or Ayushman Bharat' },
-        { title: 'Upload Document AI', description: 'Click 📎 to verify Income / Farmer Certificate eligibility' },
-      ],
-      sources: [
-        { name: 'MyScheme Portal', url: 'https://myscheme.gov.in' }
-      ],
-      content: `# Namaste! I am JanMitra AI 🇮🇳
+      isWelcome: true,
+      content: `## Namaste! I am JanMitra AI 🙏
 
-I am your intelligent multi-agent citizen assistant. Ask me anything regarding **Government Schemes, Healthcare, Education, Employment, Agriculture, or Legal Guidance**.
+Welcome to your intelligent citizen co-pilot. Ask me anything regarding **Government Schemes**, **Healthcare**, **Education**, **Employment**, **Agriculture**, or **Legal Rights**.
 
-*Powered by LangGraph multi-agent orchestration, Multilingual Voice TTS, and Gemini Vision Document AI.*`,
+*Tip: You can also click the 📎 button below to upload income certificates or government documents for automatic eligibility check.*`,
     }
   ])
   const [input, setInput] = useState('')
@@ -205,26 +198,40 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
 
         {/* Suggested Prompts */}
         {messages.length <= 1 && (
-          <div style={{ position: 'relative', zIndex: 2, padding: '0 20px 12px', display: 'flex', gap: 8, overflowX: 'auto', flexWrap: 'wrap' }}>
-            {SUGGESTED_PROMPTS.map(p => (
-              <motion.button
-                key={p.label}
-                whileHover={{ scale: 1.03, borderColor: 'rgba(56,189,248,0.4)' }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => handleSend(p.query)}
-                style={{
-                  padding: '7px 14px',
-                  background: 'rgba(37,99,235,0.1)',
-                  border: '1px solid rgba(37,99,235,0.25)',
-                  borderRadius: 20, color: '#60A5FA',
-                  fontSize: 12, cursor: 'pointer',
-                  whiteSpace: 'nowrap', fontFamily: 'Inter, sans-serif',
-                  transition: 'all 0.2s',
-                }}
-              >
-                {p.label}
-              </motion.button>
-            ))}
+          <div style={{ position: 'relative', zIndex: 2, padding: '0 20px 14px' }}>
+            <div style={{ fontSize: 11, fontWeight: 700, color: '#60A5FA', textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: 8, display: 'flex', alignItems: 'center', gap: 6 }}>
+              <span>💡</span> Suggested Quick Topics
+            </div>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 10 }}>
+              {SUGGESTED_PROMPTS.map(p => (
+                <motion.button
+                  key={p.label}
+                  whileHover={{ scale: 1.02, borderColor: 'rgba(56,189,248,0.4)', backgroundColor: 'rgba(37,99,235,0.18)' }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleSend(p.query)}
+                  style={{
+                    padding: '10px 14px',
+                    background: 'rgba(11,36,71,0.6)',
+                    border: '1px solid rgba(56,189,248,0.2)',
+                    borderRadius: 12,
+                    color: '#F0F6FF',
+                    fontSize: 13,
+                    fontWeight: 500,
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 8,
+                    fontFamily: 'Inter, sans-serif',
+                    textAlign: 'left',
+                    boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+                    transition: 'all 0.2s',
+                  }}
+                >
+                  <span style={{ fontSize: 16 }}>{p.icon}</span>
+                  <span style={{ color: '#60A5FA', fontWeight: 600, fontSize: 13 }}>{p.label}</span>
+                </motion.button>
+              ))}
+            </div>
           </div>
         )}
 
@@ -323,9 +330,6 @@ I am your intelligent multi-agent citizen assistant. Ask me anything regarding *
               }}
             >→</motion.button>
           </div>
-          <p style={{ fontSize: 11, color: 'rgba(240,246,255,0.3)', textAlign: 'center', marginTop: 8 }}>
-            JanMitra AI matches queries using real RAG vector retrieval & LangGraph multi-agent orchestration.
-          </p>
         </div>
 
         {/* Document Upload Modal */}

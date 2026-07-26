@@ -118,8 +118,8 @@ export function AIMessage({ message }) {
             <div style={{ fontSize: 14, lineHeight: 1.75, color: 'rgba(240,246,255,0.9)' }}>
               <ReactMarkdown
                 components={{
-                  h3: ({ children }) => <h3 style={{ color: '#60A5FA', fontSize: 15, fontWeight: 600, marginBottom: 8, marginTop: 16 }}>{children}</h3>,
-                  h2: ({ children }) => <h2 style={{ color: '#38BDF8', fontSize: 17, fontWeight: 700, marginBottom: 10, marginTop: 20 }}>{children}</h2>,
+                  h3: ({ children }) => <h3 style={{ color: '#60A5FA', fontSize: 15, fontWeight: 600, marginBottom: 8, marginTop: 14 }}>{children}</h3>,
+                  h2: ({ children }) => <h2 style={{ color: '#38BDF8', fontSize: 18, fontWeight: 700, marginBottom: 10, marginTop: 0 }}>{children}</h2>,
                   strong: ({ children }) => <strong style={{ color: '#F0F6FF', fontWeight: 600 }}>{children}</strong>,
                   ul: ({ children }) => <ul style={{ paddingLeft: 20, marginBottom: 8 }}>{children}</ul>,
                   li: ({ children }) => <li style={{ marginBottom: 4, color: 'rgba(240,246,255,0.85)' }}>{children}</li>,
@@ -154,7 +154,7 @@ export function AIMessage({ message }) {
             </div>
 
             {/* 3. Action Toolbar (Voice Player & PDF Export) */}
-            {contentText && (
+            {contentText && !message.isWelcome && (
               <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginTop: 12 }}>
                 <VoicePlayerBar messageId={messageId} originalText={contentText} />
                 <PDFExportButton messageData={{ ...message, text: contentText }} />

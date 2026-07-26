@@ -4,13 +4,8 @@ import { sendChatMessage } from '../clients/chatClient'
 const INITIAL_WELCOME = {
   id: 'welcome-1',
   sender: 'ai',
-  text: `### Namaste! I am JanMitra AI 🇮🇳\n\nI am your intelligent multi-agent citizen assistant. Ask me anything regarding **Government Schemes, Healthcare, Education, Employment, Agriculture, or Legal Guidance**.`,
-  agents: ['Router Agent'],
-  actionPlan: [
-    { title: 'PM-KISAN Query', description: 'Ask about direct income support for land-holding farmers' },
-    { title: 'Health Guidance', description: 'Find nearby civil hospitals or Ayushman Bharat eligibility' },
-    { title: 'Scholarships', description: 'Explore National Scholarship Portal and state education schemes' },
-  ],
+  isWelcome: true,
+  text: `## Namaste! I am JanMitra AI 🙏\n\nWelcome to your intelligent citizen co-pilot. Ask me anything regarding **Government Schemes**, **Healthcare**, **Education**, **Employment**, **Agriculture**, or **Legal Rights**.`,
 }
 
 export function useChat() {

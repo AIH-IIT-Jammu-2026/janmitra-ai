@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import Sidebar from '../components/Sidebar'
+import Sidebar from '../components/layout/Sidebar'
 import NeuralBackground from '../components/NeuralBackground'
 
 const STAGES = [
