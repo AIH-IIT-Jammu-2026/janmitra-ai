@@ -86,14 +86,8 @@ export default function VirtualAssistantModal() {
       const res = await startAssistantSessionAPI(code)
       setSessionId(res.session_id)
 
-      const warmGreeting =
-        code === 'hi-IN'
-          ? "नमस्ते! जनमित्र AI में आपका स्वागत है। मैं आपकी सहायता सरकारी फॉर्म भरने, दस्तावेज़ समझने, या किसी भी सेवा में कर सकता हूँ। आज आप क्या करना चाहेंगे?"
-          : "Namaste! Welcome to JanMitra AI. I can help you fill government forms, explain documents, answer study questions, or guide you through any portal. What would you like help with today?"
-
-      const welcomeMsg = { id: Date.now(), type: 'assistant', text: warmGreeting }
-      setMessages([welcomeMsg])
-      // Automatic voice greeting auto-playback removed per user request
+      // Set empty initial messages so D-ID Agent Avatar handles the opening greeting cleanly without double greeting
+      setMessages([])
     } catch (err) {
       console.warn('Error launching assistant:', err)
     }
