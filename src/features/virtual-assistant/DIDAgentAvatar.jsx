@@ -3,9 +3,9 @@ import janviAvatarReal from '../../assets/janvi_avatar_real.png'
 
 export default function DIDAgentAvatar({ state = 'idle' }) {
   const [iframeError, setIframeError] = useState(false)
-  const clientKey = import.meta.env.VITE_DID_CLIENT_KEY || 'ck_vg6jNcoaCgGoWmuhnzPql'
-  const agentId = import.meta.env.VITE_DID_AGENT_ID || 'v2_agt_61-8izVy'
-  const shareUrl = 'https://studio.d-id.com/agents/share?id=v2_agt_61-8izVy&key=Y2tfZ1k1Q1RZbEtHQmJXRWY0QmM1SFQz'
+  const clientKey = import.meta.env.VITE_DID_CLIENT_KEY || 'ck_gY5CTYlKGBbWEf4Bc5HT3'
+  const agentId = import.meta.env.VITE_DID_AGENT_ID || 'v2_agt_Wv_YTk5o'
+  const shareUrl = `https://studio.d-id.com/agents/share?id=${agentId}&key=${clientKey}`
 
   useEffect(() => {
     // Inject D-ID SDK script module if missing
