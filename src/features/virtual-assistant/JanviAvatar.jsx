@@ -1,9 +1,12 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import ThreeDJanviAvatar from './ThreeDJanviAvatar'
 import DIDAgentAvatar from './DIDAgentAvatar'
+import janviAvatarReal from '../../assets/janvi_avatar_real.png'
 
 export default function JanviAvatar({ state = 'idle' }) {
+  const [avatarMode, setAvatarMode] = useState('did') // 'did' or 'native'
+
   // State Visual Configurations
   const stateConfig = {
     idle: {
@@ -11,8 +14,8 @@ export default function JanviAvatar({ state = 'idle' }) {
       glow: 'rgba(56,189,248,0.5)',
       badgeBg: 'rgba(56,189,248,0.15)',
       badgeBorder: 'rgba(56,189,248,0.4)',
-      statusTag: '● D-ID DIGITAL HUMAN',
-      text: '😊 Live D-ID Janvi Avatar · Connected',
+      statusTag: avatarMode === 'did' ? '● D-ID DIGITAL HUMAN' : '● NATIVE AI AVATAR',
+      text: avatarMode === 'did' ? '😊 Live D-ID Digital Human' : '😊 Janvi AI Online · Ready',
     },
     listening: {
       color: '#2563EB',
@@ -44,7 +47,7 @@ export default function JanviAvatar({ state = 'idle' }) {
       badgeBg: 'rgba(16,185,129,0.25)',
       badgeBorder: 'rgba(16,185,129,0.6)',
       statusTag: '🔊 Speaking...',
-      text: '🗣 Live D-ID Digital Human Responding',
+      text: '🗣 Janvi Responding',
     },
   }
 
@@ -52,6 +55,25 @@ export default function JanviAvatar({ state = 'idle' }) {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', position: 'relative', width: '100%' }}>
+      {/* Mode Switcher Bar */}
+      <div style={{ marginBottom: 8, display: 'flex', gap: 6, zIndex: 10 }}>
+        <button
+          onClick={() => setAvatarMode(avatarMode === 'did' ? 'native' : 'did')}
+          style={{
+            padding: '3px 10px',
+            borderRadius: 12,
+            background: 'rgba(4,13,26,0.85)',
+            border: '1px solid rgba(56,189,248,0.3)',
+            color: '#38BDF8',
+            fontSize: 10.5,
+            fontWeight: 700,
+            cursor: 'pointer',
+          }}
+        >
+          🔄 {avatarMode === 'did' ? 'Switch to Native AI Girl' : 'Switch to D-ID Agent'}
+        </button>
+      </div>
+
       {/* Outer Ambient Glowing Halo */}
       <motion.div
         animate={{
@@ -64,14 +86,14 @@ export default function JanviAvatar({ state = 'idle' }) {
           height: 280,
           borderRadius: 36,
           position: 'absolute',
-          top: -12,
+          top: 24,
           background: `radial-gradient(circle, ${current.glow} 0%, transparent 75%)`,
           zIndex: 1,
           filter: 'blur(18px)',
         }}
       />
 
-      {/* Main 3D Card Container (D-ID Real-Time Interactive Streaming Avatar + WebGL 3D Engine) */}
+      {/* Main Card Container */}
       <motion.div
         animate={
           state === 'speaking'
@@ -124,7 +146,7 @@ export default function JanviAvatar({ state = 'idle' }) {
           <span>{current.statusTag}</span>
         </div>
 
-        {/* Vision Laser HUD Scanner Line when in Vision Mode */}
+        {/* Vision Laser HUD Scanner Line */}
         {state === 'looking' && (
           <motion.div
             animate={{ y: [-140, 140, -140] }}
@@ -140,9 +162,22 @@ export default function JanviAvatar({ state = 'idle' }) {
           />
         )}
 
-        {/* D-ID Real-Time Interactive Streaming Avatar Component */}
+        {/* Render Selected Avatar Component */}
         <div style={{ position: 'relative', width: '100%', height: '100%' }}>
-          <DIDAgentAvatar state={state} />
+          {avatarMode === 'did' ? (
+            <DIDAgentAvatar state={state} />
+          ) : (
+            <img
+              src={janviAvatarReal}
+              alt="Native Janvi AI Assistant"
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                borderRadius: 22,
+              }}
+            />
+          )}
         </div>
 
         {/* Audio Equalizer Synced when Janvi is Speaking */}
