@@ -446,8 +446,7 @@ export default function VirtualAssistantModal() {
               {/* Phase 12 Smart Follow-ups Suggestions */}
               <SmartFollowups suggestions={smartFollowups} onSelect={handleSendText} />
 
-              {/* Phase 6 Education Mode Presets */}
-              <EducationModePreset onSelect={handleSendText} />
+
 
               {/* Conversation Log Feed */}
               <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: 8, marginTop: 10, paddingRight: 6 }}>
