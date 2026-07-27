@@ -96,7 +96,9 @@ export default function JanviAvatar({ state = 'idle' }) {
       {/* Main Card Container */}
       <motion.div
         animate={
-          state === 'speaking'
+          avatarMode === 'did'
+            ? { y: 0, rotate: 0, scale: 1 }
+            : state === 'speaking'
             ? { y: [0, -6, 0, -3, 0], rotate: [0, 1, -1, 0] }
             : state === 'looking'
             ? { rotate: [-1, 2, -2, 1], scale: [1, 1.02, 1] }
@@ -104,7 +106,7 @@ export default function JanviAvatar({ state = 'idle' }) {
             ? { y: [0, -4, 0], rotate: [0, -1.5, 1.5, 0] }
             : { y: [0, -5, 0], rotate: [-1, 1, -1] }
         }
-        transition={{ duration: state === 'speaking' ? 0.5 : 3.5, repeat: Infinity, ease: 'easeInOut' }}
+        transition={{ duration: avatarMode === 'did' ? 0 : state === 'speaking' ? 0.5 : 3.5, repeat: Infinity, ease: 'easeInOut' }}
         style={{
           width: 245,
           height: 285,
