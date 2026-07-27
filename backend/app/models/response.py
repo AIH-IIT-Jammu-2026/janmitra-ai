@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel
 
 class ActionItem(BaseModel):
@@ -15,3 +15,5 @@ class ChatResponse(BaseModel):
     agents: List[str] = []
     action_plan: List[ActionItem] = []
     sources: List[SourceItem] = []
+    active_agents: List[str] = []
+    agent_latencies: Dict[str, int] = {}

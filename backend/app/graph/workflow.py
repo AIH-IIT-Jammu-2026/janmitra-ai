@@ -19,23 +19,41 @@ AGENT_NODES = {
     "Government Schemes": "schemes_agent",
 }
 
+# Map graph node names to the ids used by the frontend AgentGraphVisualizer
+FRONTEND_AGENT_IDS = {
+    "router": "router",
+    "education_agent": "education",
+    "agriculture_agent": "agriculture",
+    "healthcare_agent": "health",
+    "schemes_agent": "schemes",
+    "aggregator": "aggregator",
+}
+
 
 def router_node(state: AgentState) -> Dict[str, Any]:
     logger.info("Executing Router Node...")
+    start = time.perf_counter()
     message = state.get("message", "")
     selected = route_query(message)
+    elapsed_ms = int((time.perf_counter() - start) * 1000)
     logger.info(f"Router Selected: {', '.join(selected) if selected else 'None'}")
     return {
         "selected_agents": selected,
+        "agent_latencies": [{"agent": "router", "ms": elapsed_ms}],
     }
 
 
 def education_node(state: AgentState) -> Dict[str, Any]:
     logger.info("Running Education Agent...")
+    start = time.perf_counter()
     try:
         res = run_education_agent(state["message"])
+        elapsed_ms = int((time.perf_counter() - start) * 1000)
         logger.info("Completed Education Agent.")
-        return {"agent_outputs": [res]}
+        return {
+            "agent_outputs": [res],
+            "agent_latencies": [{"agent": "education", "ms": elapsed_ms}],
+        }
     except Exception as e:
         logger.error(f"Education Agent failed: {e}")
         err: AgentError = {"agent": "Education", "message": str(e), "timestamp": time.time()}
@@ -44,10 +62,15 @@ def education_node(state: AgentState) -> Dict[str, Any]:
 
 def agriculture_node(state: AgentState) -> Dict[str, Any]:
     logger.info("Running Agriculture Agent...")
+    start = time.perf_counter()
     try:
         res = run_agriculture_agent(state["message"])
+        elapsed_ms = int((time.perf_counter() - start) * 1000)
         logger.info("Completed Agriculture Agent.")
-        return {"agent_outputs": [res]}
+        return {
+            "agent_outputs": [res],
+            "agent_latencies": [{"agent": "agriculture", "ms": elapsed_ms}],
+        }
     except Exception as e:
         logger.error(f"Agriculture Agent failed: {e}")
         err: AgentError = {"agent": "Agriculture", "message": str(e), "timestamp": time.time()}
@@ -56,10 +79,15 @@ def agriculture_node(state: AgentState) -> Dict[str, Any]:
 
 def healthcare_node(state: AgentState) -> Dict[str, Any]:
     logger.info("Running Healthcare Agent...")
+    start = time.perf_counter()
     try:
         res = run_health_agent(state["message"])
+        elapsed_ms = int((time.perf_counter() - start) * 1000)
         logger.info("Completed Healthcare Agent.")
-        return {"agent_outputs": [res]}
+        return {
+            "agent_outputs": [res],
+            "agent_latencies": [{"agent": "health", "ms": elapsed_ms}],
+        }
     except Exception as e:
         logger.error(f"Healthcare Agent failed: {e}")
         err: AgentError = {"agent": "Healthcare", "message": str(e), "timestamp": time.time()}
@@ -68,10 +96,15 @@ def healthcare_node(state: AgentState) -> Dict[str, Any]:
 
 def schemes_node(state: AgentState) -> Dict[str, Any]:
     logger.info("Running Government Schemes Agent...")
+    start = time.perf_counter()
     try:
         res = run_schemes_agent(state["message"])
+        elapsed_ms = int((time.perf_counter() - start) * 1000)
         logger.info("Completed Government Schemes Agent.")
-        return {"agent_outputs": [res]}
+        return {
+            "agent_outputs": [res],
+            "agent_latencies": [{"agent": "schemes", "ms": elapsed_ms}],
+        }
     except Exception as e:
         logger.error(f"Government Schemes Agent failed: {e}")
         err: AgentError = {"agent": "Government Schemes", "message": str(e), "timestamp": time.time()}
@@ -95,13 +128,18 @@ def select_expert_agents(state: AgentState) -> List[str]:
 
 def aggregator_node(state: AgentState) -> Dict[str, Any]:
     logger.info("Running Aggregator...")
+    start = time.perf_counter()
     message = state.get("message", "")
     agent_outputs = state.get("agent_outputs", [])
 
     response_model = run_aggregator_agent(message, agent_outputs)
     final_resp = response_model.model_dump()
+    elapsed_ms = int((time.perf_counter() - start) * 1000)
 
-    return {"final_response": final_resp}
+    return {
+        "final_response": final_resp,
+        "agent_latencies": [{"agent": "aggregator", "ms": elapsed_ms}],
+    }
 
 
 # ── Build & Compile LangGraph StateGraph ──────────────────────────────────────
@@ -174,6 +212,7 @@ def run_agent_workflow(message: str, session_id: str = "123", language: str = "e
         "final_response": {},
         "retrieved_documents": [],
         "errors": [],
+        "agent_latencies": [],
     }
 
     final_state = workflow_app.invoke(initial_state)
@@ -181,4 +220,21 @@ def run_agent_workflow(message: str, session_id: str = "123", language: str = "e
     elapsed = time.perf_counter() - start_time
     logger.info(f"Workflow Completed Successfully in {elapsed:.2f} seconds.")
 
-    return final_state.get("final_response", {})
+    final_response = final_state.get("final_response", {})
+
+    # Build active_agents list using frontend-friendly ids.
+    # Router and Aggregator always run; expert agents only if selected.
+    selected_names = final_state.get("selected_agents", [])
+    selected_node_names = [AGENT_NODES[name] for name in selected_names if name in AGENT_NODES]
+    active_agents = ["router"] + [
+        FRONTEND_AGENT_IDS[node] for node in selected_node_names if node in FRONTEND_AGENT_IDS
+    ] + ["aggregator"]
+
+    # Build latency dict keyed by frontend agent id, e.g. {"router": 110, "education": 240}
+    latency_list = final_state.get("agent_latencies", [])
+    agent_latencies = {entry["agent"]: entry["ms"] for entry in latency_list if "agent" in entry}
+
+    final_response["active_agents"] = active_agents
+    final_response["agent_latencies"] = agent_latencies
+
+    return final_response
