@@ -23,11 +23,13 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Include API routers
+# Include API routers without duplicate prefixes
 app.include_router(chat_router, prefix="/api")
+app.include_router(chat_router)  # Also allow direct /chat
 app.include_router(documents_router, prefix="/api")
+app.include_router(documents_router) # Also allow direct /documents
 app.include_router(translation_router, prefix="/api")
-app.include_router(assistant_router, prefix="/api/assistant")
+app.include_router(assistant_router) # Assistant router already has prefix="/api/assistant"
 
 @app.get("/")
 def read_root():
