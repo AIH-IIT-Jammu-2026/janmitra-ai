@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import NeuralBackground from '../components/NeuralBackground'
 import LanguageSwitcher from '../components/common/LanguageSwitcher'
+import LogoIcon from '../components/common/LogoIcon'
 import { useLanguage } from '../context/LanguageContext'
 
 const FEATURES = [
@@ -78,21 +79,7 @@ function Navbar() {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-        <div
-          style={{
-            width: 36,
-            height: 36,
-            background: 'linear-gradient(135deg, #2563EB, #38BDF8)',
-            borderRadius: 10,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 18,
-            boxShadow: '0 0 16px rgba(37,99,235,0.5)',
-          }}
-        >
-          🇮🇳
-        </div>
+        <LogoIcon size={36} />
         <span style={{ fontWeight: 800, fontSize: 18, color: '#F0F6FF', fontFamily: 'Space Grotesk, sans-serif' }}>
           JanMitra AI
         </span>

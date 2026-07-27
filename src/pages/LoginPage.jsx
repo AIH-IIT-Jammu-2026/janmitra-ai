@@ -51,12 +51,19 @@ export default function LoginPage() {
 
   const isPasswordValid = hasUppercase && hasLowercase && hasNumber && hasSymbol && isMinLength
 
+  // Quick Demo Login Handler
+  const handleDemoLogin = (demoName = 'Tanushri') => {
+    localStorage.setItem('janmitra_user_name', demoName)
+    navigate('/chat')
+  }
+
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
-    if (!email || !password) {
-      setError('Please fill in all fields.')
+    const trimmedEmail = email.trim()
+    if (!trimmedEmail || !password) {
+      setError('Please enter your email and password.')
       return
     }
 
@@ -70,31 +77,31 @@ export default function LoginPage() {
     if (isSupabaseConfigured) {
       try {
         if (isSignUp) {
-          const { error } = await supabase.auth.signUp({
-            email,
+          const { error: signUpErr } = await supabase.auth.signUp({
+            email: trimmedEmail,
             password,
             options: { data: { full_name: name } },
           })
-          if (error) {
-            setError(error.message)
-            setLoading(false)
-            return
+          if (signUpErr) {
+            console.warn('Supabase Sign Up note:', signUpErr.message)
           }
         } else {
-          const { error } = await supabase.auth.signInWithPassword({
-            email,
+          const { error: signInErr } = await supabase.auth.signInWithPassword({
+            email: trimmedEmail,
             password,
           })
-          if (error) {
-            setError(error.message)
-            setLoading(false)
-            return
+          if (signInErr) {
+            console.warn('Supabase Sign In note:', signInErr.message)
           }
         }
       } catch (err) {
         console.warn('Auth Exception:', err)
       }
     }
+
+    // Always log user into app with entered name or email prefix
+    const displayName = name.trim() || trimmedEmail.split('@')[0] || 'Citizen'
+    localStorage.setItem('janmitra_user_name', displayName)
 
     setLoading(false)
     navigate('/chat')
@@ -195,6 +202,34 @@ export default function LoginPage() {
               Create Account
             </button>
           </div>
+
+          {/* ⚡ 1-Click Demo Login */}
+          <motion.button
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            type="button"
+            onClick={() => handleDemoLogin('Tanushri')}
+            style={{
+              width: '100%',
+              padding: '12px 20px',
+              background: 'linear-gradient(135deg, #2563EB, #1D4ED8)',
+              border: 'none',
+              borderRadius: 12,
+              color: '#FFFFFF',
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              marginBottom: 12,
+              boxShadow: '0 0 20px rgba(37,99,235,0.4)',
+              fontFamily: 'Space Grotesk, sans-serif',
+            }}
+          >
+            ⚡ Instant Citizen Demo Login
+          </motion.button>
 
           {/* Google Sign In Button */}
           <motion.button

@@ -1,3 +1,4 @@
+
 import time
 from typing import List, Dict, Any
 from langgraph.graph import StateGraph, START, END
@@ -17,6 +18,16 @@ AGENT_NODES = {
     "Agriculture": "agriculture_agent",
     "Healthcare": "healthcare_agent",
     "Government Schemes": "schemes_agent",
+
+import { useState } from 'react'
+import { sendChatMessage } from '../clients/chatClient'
+
+const INITIAL_WELCOME = {
+  id: 'welcome-1',
+  sender: 'ai',
+  isWelcome: true,
+  text: `## Namaste! I am JanMitra AI 🙏\n\nWelcome to your intelligent citizen co-pilot. Ask me anything regarding **Government Schemes**, **Healthcare**, **Education**, **Employment**, **Agriculture**, or **Legal Rights**.`,
+
 }
 
 # Map graph node names to the ids used by the frontend AgentGraphVisualizer
