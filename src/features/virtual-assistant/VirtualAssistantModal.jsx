@@ -88,12 +88,12 @@ export default function VirtualAssistantModal() {
 
       const warmGreeting =
         code === 'hi-IN'
-          ? "नमस्ते! मैं जनवी हूँ, आपकी एआई नागरिक सहायिका। मैं आपकी सहायता सरकारी फॉर्म भरने, दस्तावेज़ समझने, या किसी भी पोर्टल में कर सकती हूँ। आज आप क्या करना चाहेंगे?"
-          : "Namaste! I'm Janvi, your AI Citizen Assistant. I can help you fill government forms, explain documents, answer study questions, or guide you through any website. What would you like help with today?"
+          ? "नमस्ते! जनमित्र AI में आपका स्वागत है। मैं आपकी सहायता सरकारी फॉर्म भरने, दस्तावेज़ समझने, या किसी भी सेवा में कर सकता हूँ। आज आप क्या करना चाहेंगे?"
+          : "Namaste! Welcome to JanMitra AI. I can help you fill government forms, explain documents, answer study questions, or guide you through any portal. What would you like help with today?"
 
       const welcomeMsg = { id: Date.now(), type: 'assistant', text: warmGreeting }
       setMessages([welcomeMsg])
-      speakResponse(warmGreeting)
+      // Automatic voice greeting auto-playback removed per user request
     } catch (err) {
       console.warn('Error launching assistant:', err)
     }

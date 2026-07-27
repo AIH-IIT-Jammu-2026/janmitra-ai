@@ -13,7 +13,7 @@ export async function startAssistantSessionAPI(language = 'en-IN') {
     console.warn('startAssistantSessionAPI warning:', err)
     return {
       session_id: `demo_${Date.now()}`,
-      greeting: "Namaste! Welcome to JanMitra AI. I am Janvi, your AI Citizen Co-Pilot.",
+      greeting: "Namaste! Welcome to JanMitra AI. How can I help you today?",
       language,
       active_agents: ['Router Agent', 'Janvi Assistant'],
       context_chips: ['🌐 Active Session', '🤖 Multi-Agent Engine'],

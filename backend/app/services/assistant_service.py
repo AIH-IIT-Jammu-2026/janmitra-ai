@@ -23,9 +23,9 @@ def start_assistant_session(language: str = "en-IN") -> Dict[str, Any]:
   ASSISTANT_SESSIONS[session_id] = session_data
 
   welcome_text = {
-    "en-IN": "Namaste! Welcome to JanMitra AI. I'm Janvi, your AI Citizen Co-Pilot. I can assist you across Government Schemes, Education, Healthcare, Agriculture, Employment, Legal, and Emergency Services. How can I help you today?",
-    "hi-IN": "नमस्ते! जनमित्र एआई में आपका स्वागत है। मैं जानवी हूँ, आपकी एआई नागरिक को-पायलट। मैं आपकी सहायता सरकारी योजनाओं, शिक्षा, स्वास्थ्य, कृषि, और रोजगार में कर सकती हूँ। आज मैं आपकी क्या मदद करूँ?",
-    "mr-IN": "नमस्ते! जनमित्र AI मध्ये आपले स्वागत आहे. मी जान्हवी आहे, तुमची AI नागरिक सह-पायलट. मी तुम्हाला सरकारी योजना, शिक्षण, आरोग्य आणि शेतीबाबत मदत करू शकते. आज मी तुम्हाला कशी मदत करू?",
+    "en-IN": "Namaste! Welcome to JanMitra AI. I can assist you across Government Schemes, Education, Healthcare, Agriculture, Employment, Legal, and Emergency Services. How can I help you today?",
+    "hi-IN": "नमस्ते! जनमित्र एआई में आपका स्वागत है। मैं आपकी सहायता सरकारी योजनाओं, शिक्षा, स्वास्थ्य, कृषि, और रोजगार में कर सकता हूँ। आज मैं आपकी क्या मदद करूँ?",
+    "mr-IN": "नमस्ते! जनमित्र AI मध्ये आपले स्वागत आहे. मी तुम्हाला सरकारी योजना, शिक्षण, आरोग्य आणि शेतीबाबत मदत करू शकतो. आज मी तुम्हाला कशी मदत करू?",
   }
 
   greeting = welcome_text.get(language, welcome_text["en-IN"])
