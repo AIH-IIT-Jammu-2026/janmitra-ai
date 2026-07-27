@@ -356,24 +356,7 @@ export default function VirtualAssistantModal() {
                 )}
               </div>
 
-              {/* "Currently Viewing" Smart Inspection Box */}
-              <div
-                style={{
-                  background: 'rgba(11,36,71,0.7)',
-                  border: '1px solid rgba(56,189,248,0.2)',
-                  borderRadius: 16,
-                  padding: 12,
-                }}
-              >
-                <div style={{ fontSize: 11, fontWeight: 700, color: '#38BDF8', letterSpacing: 1, textTransform: 'uppercase', marginBottom: 6 }}>
-                  Currently Viewing
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4, fontSize: 11.5, color: 'rgba(240,246,255,0.85)' }}>
-                  <div>🏛 <strong>Portal:</strong> {currentWebsiteState}</div>
-                  <div>📍 <strong>Location:</strong> Maharashtra, India</div>
-                  <div>🌾 <strong>Domain:</strong> Agriculture Assistance</div>
-                </div>
-              </div>
+
             </div>
 
             {/* CENTER COLUMN: Live Assistant Speech Stage & Sequence Log & Presets */}
