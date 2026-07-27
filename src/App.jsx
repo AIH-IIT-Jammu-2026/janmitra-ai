@@ -8,6 +8,7 @@ import DashboardPage from './pages/DashboardPage'
 import DocumentsPage from './pages/DocumentsPage'
 import { AssistantProvider } from './context/AssistantContext'
 import VirtualAssistantModal from './features/virtual-assistant/VirtualAssistantModal'
+import OfflineBadge from './components/common/OfflineBadge'
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <VirtualAssistantModal />
+        <OfflineBadge />
       </AssistantProvider>
     </BrowserRouter>
   )

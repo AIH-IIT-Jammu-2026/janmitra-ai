@@ -1,0 +1,18 @@
+{
+  "name": "JanMitra AI - India's Citizen Intelligence Platform",
+  "short_name": "JanMitra AI",
+  "description": "One AI for every citizen service in any language. Get help with government schemes, health, education, agriculture, and more — even offline.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#040d1a",
+  "theme_color": "#07111f",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icons.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
