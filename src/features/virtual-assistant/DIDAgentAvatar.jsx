@@ -3,26 +3,27 @@ import janviAvatarReal from '../../assets/janvi_avatar_real.png'
 
 export default function DIDAgentAvatar({ state = 'idle' }) {
   const [iframeError, setIframeError] = useState(false)
-  const clientKey = import.meta.env.VITE_DID_CLIENT_KEY || 'ck_gY5CTYlKGBbWEf4Bc5HT3'
-  const agentId = import.meta.env.VITE_DID_AGENT_ID || 'v2_agt_Wv_YTk5o'
-  const shareUrl = `https://studio.d-id.com/agents/share?id=${agentId}&key=${clientKey}`
+  const clientKey = 'ck_gY5CTYlKGBbWEf4Bc5HT3'
+  const agentId = 'v2_agt_Wv_YTk5o'
+  // Force cache bust to load NEW agent ID v2_agt_Wv_YTk5o
+  const shareUrl = `https://studio.d-id.com/agents/share?id=${agentId}&key=${clientKey}&v=new`
 
   useEffect(() => {
-    // Inject D-ID SDK script module if missing
-    let script = document.getElementById('did-agent-sdk-script')
-    if (!script) {
-      script = document.createElement('script')
-      script.id = 'did-agent-sdk-script'
-      script.type = 'module'
-      script.src = 'https://agent.d-id.com/v2/index.js'
-      script.setAttribute('data-mode', 'full')
-      script.setAttribute('data-client-key', clientKey)
-      script.setAttribute('data-agent-id', agentId)
-      script.setAttribute('data-name', 'did-agent')
-      script.setAttribute('data-monitor', 'true')
-      script.setAttribute('data-target-id', 'did-agent-sdk-container')
-      document.head.appendChild(script)
-    }
+    // Remove previous script instances to force loading new agent credentials
+    const oldScript = document.getElementById('did-agent-sdk-script')
+    if (oldScript) oldScript.remove()
+
+    const script = document.createElement('script')
+    script.id = 'did-agent-sdk-script'
+    script.type = 'module'
+    script.src = 'https://agent.d-id.com/v2/index.js'
+    script.setAttribute('data-mode', 'full')
+    script.setAttribute('data-client-key', clientKey)
+    script.setAttribute('data-agent-id', agentId)
+    script.setAttribute('data-name', 'did-agent')
+    script.setAttribute('data-monitor', 'true')
+    script.setAttribute('data-target-id', 'did-agent-sdk-container')
+    document.head.appendChild(script)
   }, [clientKey, agentId])
 
   return (
@@ -40,11 +41,12 @@ export default function DIDAgentAvatar({ state = 'idle' }) {
         boxShadow: '0 8px 32px rgba(0, 242, 254, 0.3)',
       }}
     >
-      {/* 1. Primary Live D-ID Share Stream Iframe */}
+      {/* 1. Primary Live D-ID Share Stream Iframe (Targeting NEW Agent v2_agt_Wv_YTk5o) */}
       {!iframeError ? (
         <iframe
+          key={agentId}
           src={shareUrl}
-          title="Janvi AI - Live D-ID Digital Human"
+          title="Janvi AI - Live D-ID Digital Human (v2_agt_Wv_YTk5o)"
           allow="microphone; camera; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           onError={() => setIframeError(true)}
